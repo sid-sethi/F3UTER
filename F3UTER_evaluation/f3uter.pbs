@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#PBS -l nodes=1:bits64:ppn=8:cpu
+#PBS -V
+
+echo "REPEAT $2"
+
+/R_v3.6.2/bin/Rscript f3uter_cv.R $1/ $2
