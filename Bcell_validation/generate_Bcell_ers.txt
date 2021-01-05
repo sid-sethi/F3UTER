@@ -1,0 +1,21 @@
+
+3’ intergenic ERs in B cells were detected using the pipeline detailed in Zhang et al. 2020
+The code is available here: https://github.com/dzhang32/ER_paper_2020_supp_code
+
+Following were the steps used to generate ERs:
+1. use generate_ERs_varying_cutoffs.R
+2. use merge_chrs_varying_cutoffs.R
+3. use generate_ERs_varying_maxgaps.R
+4. use optimise_cutoff_exonDelta.R
+5. use optimise_cutoff_exonDelta_analysis.R
+6. use annotate_ERs.R
+
+The Zhang et al. pipeline has also been wrapped into a R package: https://github.com/dzhang32/ODER 
+
+
+The ERs were then processed in the same as GTEx ERs. Please see https://github.com/sid-sethi/F3UTER/tree/master/ER_data_processing for details
+ - use er_initial_processing.pl
+ - use er_dataset_generate_for_analysis.R
+
+
+Omic features and feature matrix were calculated in the same way as GTEx data. Please see https://github.com/sid-sethi/F3UTER/tree/master/OmicFeature_generation for details.
