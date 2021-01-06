@@ -1,6 +1,6 @@
 # F3UTER - Finding 3' UnTranslated Expressed Regions
 
-This repository contains the analysis code for F3UTER
+This repository contains the analysis code for F3UTER. The contents are listed in the order of performed analysis.
 
 ## Contents
 
@@ -58,3 +58,14 @@ Script | Description
 [plot_roc_pr_curves.R](F3UTER_evaluation/plot_roc_pr_curves.R) | Plot ROC and precision-recall curves
 [f3uter_trained_model.R](F3UTER_evaluation/f3uter_trained_model.R) | Save F3UTER trained model
 
+### 6. [**Bcell_validation**](Bcell_validation)
+Validation of F3UTER predictions using RNA-seq and 3'-seq data in B cells
+
+Script | Description
+------ | -----------
+[generate_Bcell_predictions.R](Bcell_validation/generate_Bcell_predictions.R) | Generate 3'UTR predictions in B cell ER dataset using F3UTER
+[merge_erData_with_predictionData.R](Bcell_validation/merge_erData_with_predictionData.R) | Merge ER prediction data with ER raw meta-data
+[permute_random_intergenic_ERs.pl](Bcell_validation/permute_random_intergenic_ERs.pl) | Generate randomly selected intergenic ERs for permutation test
+[regions_to_exclude_for_permutation.R](Bcell_validation/regions_to_exclude_for_permutation.R) | Genomic space to mask in order to produce intergenic ER space
+[compare_knownThreePrime_with_polya.R](Bcell_validation/compare_knownThreePrime_with_polya.R) | Compare known 3'UTRs with poly(A) site clusters
+[compare_BcellErs_with_polya.R](Bcell_validation/compare_BcellErs_with_polya.R) | Compare 3'UTR predictions in B cells with poly(A) site clusters
