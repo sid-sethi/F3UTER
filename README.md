@@ -47,3 +47,14 @@ Script | Description
 [randomForestMultinomial_model.R](Uni-Multi_variate_analysis/randomForestMultinomial_model.R) | code for multinomial random forest classification
 [RF_vs_LR_analysis.R](Uni-Multi_variate_analysis/RF_vs_LR_analysis.R) | Compare multinomial logistic regression and random forest results
 
+### 5. [**F3UTER_evaluation**](F3UTER_evaluation)
+Construction and cross-validation of F3UTER
+
+Script | Description
+------ | -----------
+[run_f3uter_cv.pl](F3UTER_evaluation/run_f3uter_cv.pl) | Wrapper for running F3UTER cross validation evaluation
+[summarise_f3uter_cv.R]((F3UTER_evaluation/summarise_f3uter_cv.R) |  Wrapper for summarising cross validation results
+[f3uter_cv.R]((F3UTER_evaluation/f3uter_cv.R) | Code for training F3UTER
+[plot_roc_pr_curves.R]((F3UTER_evaluation/plot_roc_pr_curves.R) | Plot ROC and precision-recall curves
+[f3uter_trained_model.R]((F3UTER_evaluation/f3uter_trained_model.R) | Save F3UTER trained model
+
