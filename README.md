@@ -1,8 +1,19 @@
 # F3UTER - Finding 3' UnTranslated Expressed Regions
 
-This repository contains the analysis code for F3UTER. The contents are listed in the order of performed analysis.
+This repository contains the analysis code for F3UTER.
+
+## Licence
+
+Copyright 2020 Astex Therapeutics Ltd.
+
+This repository is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This repository is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [LICENSE](LICENSE) file (GNU General Public License) for more details.
+
 
 ## Contents
+
+The contents are listed in the order of performed analysis.
 
 ### 1. [**ER_data_processing**](ER_data_processing)
 Processing of ER data from Zhang et al 2020
