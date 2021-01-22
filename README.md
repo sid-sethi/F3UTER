@@ -80,3 +80,26 @@ Script | Description
 [regions_to_exclude_for_permutation.R](Bcell_validation/regions_to_exclude_for_permutation.R) | Genomic space to mask in order to produce intergenic ER space
 [compare_knownThreePrime_with_polya.R](Bcell_validation/compare_knownThreePrime_with_polya.R) | Compare known 3'UTRs with poly(A) site clusters
 [compare_BcellErs_with_polya.R](Bcell_validation/compare_BcellErs_with_polya.R) | Compare 3'UTR predictions in B cells with poly(A) site clusters
+
+### 7. [**GTEx_predictions**](GTEx_predictions)
+Applying F3UTER to ERs derived from GTEx tissues to predict unannotated 3'UTRs
+
+Script | Description
+------ | -----------
+[generate_gtex_predictions.R](GTEx_predictions/generate_gtex_predictions.R) | Use F3UTER on GTEx ERs to produce predictions
+[merge_gtexErData_with_predictions.R](GTEx_predictions/merge_gtexErData_with_predictions.R) | Merge ER prediction data with ER raw meta-data
+[calculate_gtex_prediction_numbers.R](GTEx_predictions/calculate_gtex_prediction_numbers.R) | Calculate basic stats/numbers for prediction results across tissues
+[categorise_er_tissue_specificity.R](GTEx_predictions/categorise_er_tissue_specificity.R) | Split ER predictions based on their tissue-specificity across 39 tissues
+[generate_categorised_geneLists_and_tables.R](GTEx_predictions/generate_categorised_geneLists_and_tables.R) | Generate data tables and gene lists for each category to be used for downstream analysis
+[calculate_cncr_score.R](GTEx_predictions/calculate_cncr_score.R) | Code to calculate CNC scores for a query region
+[perform_cncr_analysis.R](GTEx_predictions/perform_cncr_analysis.R) | Perform CNCR analysis on all predictions and tissue-specific groups
+
+### 8. [**GTEx_predictions_RBP_analysis**](GTEx_predictions_RBP_analysis)
+
+Calculate RBP motif enrichment within ER predictions. See [**README.md**](GTEx_predictions_RBP_analysis/README.md) for details.
+
+### 9. [**F3UTER_app**](F3UTER_app)
+
+Source code for the F3UTER online resource.
+App URL: https://astx.shinyapps.io/F3UTER/
+
