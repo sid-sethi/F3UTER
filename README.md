@@ -47,7 +47,7 @@ Script | Description
 [expression_features.R](OmicFeature_generation/expression_features.R) | Calculate entropy efficiency and percentage difference of expression reads (n=2)
 [dna_structural_features.R](OmicFeature_generation/dna_structural_features.R) | Calculate DNA structural properties (n=16)
 
-The training and E data Rfeature matrix can be downloaded from the F3UTER app: https://astx.shinyapps.io/F3UTER/
+The training and ER data feature matrix can be downloaded from the F3UTER app: https://astx.shinyapps.io/F3UTER/
 
 ### 4. [**Uni-Multi_variate_analysis**](Uni-Multi_variate_analysis)
 Univariate and multivariate analysis of omic features
