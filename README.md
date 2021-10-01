@@ -10,15 +10,22 @@ This repository is free software: you can redistribute it and/or modify it under
 
 This repository is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [LICENSE](LICENSE) file (GNU General Public License) for more details.
 
+# Using F3UTER
 
-## Contents (Intructions for use)
+The following snakemake pipelines can be used to Generate ERs, calculate omic features and produce F3UTER 3'UTR predictions.
 
-The contents are listed in the order of performed analysis. The output of these scripts are txt files. 
+- [Generate ERs](Snakemake_pipelines/Generate_ers): Identify unannotated intergenic expressed regions (ERs) from RNA-seq data.
+- [Generate features](Snakemake_pipelines/Generate_features): Calculate omic features required for F3UTER.
+- [Generate predictions](Snakemake_pipelines/Generate_predictions): Predict potentially unannotated 3'UTRs.
+
+## Analysis code associated with the F3UTER manuscript
+
+The scripts are listed in the order of performed analysis. The output of these scripts are txt files.
 
 ### 1. [**ER_data_processing**](ER_data_processing)
 Processing of ER data from Zhang et al 2020
 
-Script | Description 
+Script | Description
 ------ | -----------
 [er_split_by_tissue.R](ER_data_processing/er_split_by_tissue.R) | Split ERs by tissue
 [er_initial_processing.pl](ER_data_processing/er_initial_processing.pl) | Add additional gene info to ERs
@@ -112,4 +119,3 @@ App URL: https://astx.shinyapps.io/F3UTER/
 ## System requirements for data analysis
 
 All the data analysis was performed in R version 3.6.2. For analysis or plotting, the following packages were used: ggplot2_2_3.3.2, ggridges_0.5.2, ggridges_0.5.2, ggsignif_0.6.0, rstatix_0.6.0, derfinder_1.20.0, rtracklayer_1.46.0, GenomicFeatures_1.38.2, GenomicRanges_1.38.0, ggpubr_0.4.0, stringr_1.4.0, dplyr_1.0.2, tidyverse_1.3.0
-
