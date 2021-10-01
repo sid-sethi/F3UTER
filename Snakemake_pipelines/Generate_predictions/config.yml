@@ -1,0 +1,14 @@
+## General pipeline parameters:
+
+# working directory:
+# Within this directory, directory called "F3UTER_preictions" would be generated
+workdir: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing"
+
+# directory containing F3UTER omic feature files
+features_dir: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing/F3UTER_features"
+
+# prefix of all output files
+sample_name: "CD5"
+
+# path to ER file or BED file which was used to generate features [input file to "generate_features"]
+ers: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing/Intergenic_ERs/CD5_3prime_intergenic_ers.txt"

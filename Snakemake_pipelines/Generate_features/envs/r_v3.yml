@@ -1,0 +1,14 @@
+name: r_v3
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - bioconductor-derfinder
+ - bioconductor-BSgenome
+ - bioconductor-rtracklayer
+ - bioconductor-BSgenome.Hsapiens.UCSC.hg38.masked
+ - bioconductor-TFBSTools
+ - r-scales

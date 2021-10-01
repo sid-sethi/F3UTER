@@ -1,0 +1,11 @@
+name: r_v3
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - r-randomForest
+ - r-ROCR
+ - r-caret

@@ -1,0 +1,10 @@
+seqnames	start	end	width	strand	ER_index	gtf_TxDb_region_annot	tissue	nearest_any_gene_v94_name	associated_gene	nearest_any_gene_v94_strand	nearest_any_gene_v94_biotype	associated_gene_strand	associated_gene_biotype	prime_5_3_corrected	distance_from_geneTSS	distance_from_geneEnd	ER_id
+chr1	26476097	26476136	40	*	1862	intergenic	CD5	ENSG00000198830	ENSG00000198830	+	protein_coding	+	protein_coding	3	3686	125	CD5:chr1:26476097:26476136:*
+chr1	26476767	26476877	111	*	1863	intergenic	CD5	ENSG00000198830	ENSG00000198830	+	protein_coding	+	protein_coding	3	4427	795	CD5:chr1:26476767:26476877:*
+chr1	26476979	26477022	44	*	1864	intergenic	CD5	ENSG00000198830	ENSG00000198830	+	protein_coding	+	protein_coding	3	4572	1007	CD5:chr1:26476979:26477022:*
+chr1	52671383	52671835	453	*	4191	intergenic	CD5	ENSG00000182183	ENSG00000182183	+	protein_coding	+	protein_coding	3	38491	1700	CD5:chr1:52671383:52671835:*
+chr1	52672137	52672333	197	*	4192	intergenic	CD5	ENSG00000182183	ENSG00000182183	+	protein_coding	+	protein_coding	3	38989	2454	CD5:chr1:52672137:52672333:*
+chr1	52672894	52674321	1428	*	4193	intergenic	CD5	ENSG00000182183	ENSG00000182183	+	protein_coding	+	protein_coding	3	40977	3211	CD5:chr1:52672894:52674321:*
+chr1	52674445	52675723	1279	*	4194	intergenic	CD5	ENSG00000182183	ENSG00000182183	+	protein_coding	+	protein_coding	3	42379	4762	CD5:chr1:52674445:52675723:*
+chr1	52675993	52676632	640	*	4195	intergenic	CD5	ENSG00000182183	ENSG00000182183	+	protein_coding	+	protein_coding	3	43288	6310	CD5:chr1:52675993:52676632:*
+chr1	52676731	52678062	1332	*	4196	intergenic	CD5	ENSG00000162377	ENSG00000162377	-	protein_coding	-	protein_coding	3	-21635	-6389	CD5:chr1:52676731:52678062:*

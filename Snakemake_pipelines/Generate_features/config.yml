@@ -1,0 +1,32 @@
+## General pipeline parameters:
+
+# working directory:
+# Within this directory, directory called "F3UTER_features" would be generated
+workdir: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing"
+
+# path to ER file or any BED file - should contain columns named "ER_id"; seqnames, start, end, strand
+# see /test_data for demo files
+# contig names should be UCSC style - starting with "chr"
+ers: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing/Intergenic_ERs/CD5_3prime_intergenic_ers.txt"
+
+# prefix of all output files
+sample_name: "CD5"
+
+
+
+## Data required for calculating features:
+
+# PhastCons Bigwig file from UCSC, e.g., hg38.phastCons7way.bw
+phastcons: "/tmp_mnt/filer1/bioinformatics/Sid/PhastCons/hg38.phastCons7way.bw"
+
+# hg38 repeatmasker data - make sure the seqnames match your er data
+repeats: "/tmp_mnt/filer1/bioinformatics/Sid/Repeats/hg38.repeatMasker.mod.fa.out"
+
+# Expression data: directory containing sample bigwigs for calculating expression features.
+# all files with ".bw" will be read from this directory.
+# Can be one or multiple (replicates) bigwigs. In case of multiple bigwigs, mean expression will be calculated.
+# Since we aligned reads to a reference genome from Ensembl, this code is written for Ensembl style contigs name - "1", "2"...., "X", "Y", "MT". Please modify the code if using UCSC style contigs
+bigwig_dir: "/tmp_mnt/filer1/bioinformatics/Sid/F3UTER_validation/CD5/Bigwig"
+
+## chromosome names and lengths are required. File containg lengths for hg38 is provided in /data.
+## Please change this file according to the contig names

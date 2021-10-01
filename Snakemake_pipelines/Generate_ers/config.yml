@@ -1,0 +1,18 @@
+## General pipeline parameters:
+
+# set the working directory
+# within this directory, directory called "ERs" would be generated
+workdir: "/tmp_mnt/filer1/bioinformatics/Sid/Test/testing"
+
+# Name/path of directory containing bigwigs - all ".bw" files will be read automatically
+# Can be one or more (replicates) ".bw" files
+# Contigs should be UCSC style: chr1, chr2........
+bigwig: "/tmp_mnt/filer1/bioinformatics/Sid/F3UTER_validation/CD5/Bigwig"
+
+sample_name: "CD5"
+
+## path to ref annotation file - Ensembl GTF (Human)
+gtf: "/tmp_mnt/filer1/bioinformatics/Sid/Annotation/Homo_sapiens.GRCh38.94.gtf"
+
+## chromosome lengths are required. File containg lengths for hg38 is provided in /data.
+## The code is wriiten for hg38 settings and hard coded to use the hg38 chrom length file, but these can be easily modified within the code.
