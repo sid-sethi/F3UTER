@@ -14,9 +14,11 @@ This repository is distributed in the hope that it will be useful, but WITHOUT A
 
 The following snakemake pipelines can be used to Generate ERs, calculate omic features and produce F3UTER 3'UTR predictions.
 
-- [Generate ERs](Snakemake_pipelines/Generate_ers): Identify unannotated intergenic expressed regions (ERs) from RNA-seq data.
-- [Generate features](Snakemake_pipelines/Generate_features): Calculate omic features required for F3UTER.
-- [Generate predictions](Snakemake_pipelines/Generate_predictions): Predict potentially unannotated 3'UTRs.
+- [Generate ERs](https://github.com/sid-sethi/Generate-ERs): Identify unannotated intergenic expressed regions (ERs) from RNA-seq data.
+- [Generate F3UTER features](https://github.com/sid-sethi/Generate-F3UTER-features): Calculate omic features required for F3UTER.
+- [Generate F3UTER predictions](https://github.com/sid-sethi/Generate-F3UTER-predictions): Predict potentially unannotated 3'UTRs.
+
+
 
 ## Analysis code associated with the F3UTER manuscript
 
