@@ -19,7 +19,6 @@ The following snakemake pipelines can be used to Generate ERs, calculate omic fe
 - [Generate F3UTER predictions](https://github.com/sid-sethi/Generate-F3UTER-predictions): Predict potentially unannotated 3'UTRs.
 
 
-
 ## Analysis code associated with the F3UTER manuscript
 
 The scripts are listed in the order of performed analysis. The output of these scripts are txt files.
