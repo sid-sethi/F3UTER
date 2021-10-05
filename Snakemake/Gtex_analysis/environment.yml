@@ -1,0 +1,33 @@
+name: pipeline_gtex_analysis
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - snakemake==5.32.2
+ - bioconductor-derfinder
+ - bioconductor-BSgenome
+ - bioconductor-rtracklayer
+ - bioconductor-BSgenome.Hsapiens.UCSC.hg38.masked
+ - bioconductor-TFBSTools
+ - r-scales
+ - bioconductor-clusterProfiler
+ - bioconductor-DOSE
+ - bioconductor-org.Hs.eg.db
+ - bioconductor-plyranges
+ - r-RColorBrewer
+ - bioconductor-universalmotif
+ - r-randomForest
+ - r-ROCR
+ - r-caret
+ - r-e1071
+ - r-PRROC
+ - r-rstatix
+ - r-coin
+ - r-ggpubr
+ - r-ggridges
+ - r-ggsignif
+ - r-ggrepel
+ - r-pheatmap

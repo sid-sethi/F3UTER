@@ -1,0 +1,23 @@
+## General pipeline parameters:
+
+# Within this directory, new directories will be generated
+workdir: ""
+
+# Directiry with GTEx ERs per tissue
+er_dir: "/<>/ERs_by_tissue"
+
+# Ensembl GTF v94
+gtf_file: "/<>/Homo_sapiens.GRCh38.94.gtf"
+
+
+
+## Data required to produce F3UTER features:
+
+# PhastCons Bigwig file from UCSC
+phastcons: "/<>/hg38.phastCons7way.bw"
+
+# hg38 repeatmasker data
+repeats: "/<>/hg38.repeatMasker.mod.fa.out"
+
+# Expression data: directory containing Gtex mean expression .rda objectes per tissue per chromosome
+coverage_dir: "/<>/Mean_coverage_by_tissue"

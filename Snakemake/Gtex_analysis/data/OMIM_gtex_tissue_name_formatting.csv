@@ -1,0 +1,109 @@
+gtex_tissues_name,gtex_tissues_name_formatted,gtex_tissues_name_formatted_2,gtex_tissue_group,gtex_tissues_name_to_plot,OMIM_gtex_name,gtex_tissue_name_simplified,n_smafrze_use_me,n_all,tissue_color_hex,tissue_type,gtex_tissues_name_formatted_3
+,,,,,,,,,,,
+Adipose - Subcutaneous,adipose_subcutaneous,adipose_subcutaneous,adipose,Adipose - subcutaneous,adipose_subcutaneous,adiposesubcutaneous,349,386,FF6600,Non-brain,Adipose-subcutaneous
+,,,,,,,,,,,
+Adipose - Visceral (Omentum),adipose_visceral_omentum,adipose_visceral_omentum,adipose,Adipose - visceral,adipose_visceral_omentum,adiposevisceralomentum,227,234,FFAA00,Non-brain,Adipose-visceral
+,,,,,,,,,,,
+Adrenal Gland,adrenal_gland,adrenal_gland,adrenal,Adrenal gland,adrenal_gland,adrenalgland,145,159,33DD33,Non-brain,Adrenal gland
+,,,,,,,,,,,
+Artery - Aorta,artery_aorta,artery_aorta,artery,Aorta,artery_aorta,arteryaorta,224,247,FF5555,Non-brain,Artery-aorta
+,,,,,,,,,,,
+Artery - Coronary,artery_coronary,artery_coronary,artery,Artery - coronary,artery_coronary,arterycoronary,133,140,FFAA99,Non-brain,Artery-coronary
+,,,,,,,,,,,
+Artery - Tibial,artery_tibial,artery_tibial,artery,Artery - tibial,artery_tibial,arterytibial,332,363,FF0000,Non-brain,Artery-tibial
+,,,,,,,,,,,
+Bladder,bladder,bladder,bladder,Bladder,bladder,bladder,11,11,NA,Non-brain,Bladder
+,,,,,,,,,,,
+Brain - Amygdala,brain_amygdala,amygdala,brain,Amygdala,amygdala,amygdala,72,81,EEEE00,Brain,Amygdala
+,,,,,,,,,,,
+Brain - Anterior cingulate cortex (BA24),brain_anterior_cingulate_cortex_ba24,anterior_cingulate_cortex_ba24,brain,Anterior cingulate cortex,anteriorcingulatecortexba24,anteriorcingulatecortexba24,84,99,EEEE00,Brain,Anterior cingulate cortex
+,,,,,,,,,,,
+Brain - Caudate (basal ganglia),brain_caudate_basal_ganglia,caudate_basal_ganglia,brain,Caudate,caudatebasalganglia,caudatebasalganglia,117,134,EEEE00,Brain,Caudate basal ganglia
+,,,,,,,,,,,
+Brain - Cerebellar Hemisphere,brain_cerebellar_hemisphere,cerebellar_hemisphere,brain,Cerebellar hemisphere,brain_cerebellar_hemisphere,cerebellarhemisphere,105,118,EEEE00,Brain,Cerebellar hemisphere
+,,,,,,,,,,,
+Brain - Cerebellum,brain_cerebellum,cerebellum,brain,Cerebellum,brain_cerebellum,cerebellum,125,145,EEEE00,Brain,Cerebellum
+,,,,,,,,,,,
+Brain - Cortex,brain_cortex,cortex,brain,Cortex,cortex,cortex,114,132,EEEE00,Brain,Cortex
+,,,,,,,,,,,
+Brain - Frontal Cortex (BA9),brain_frontal_cortex_ba9,frontal_cortex_ba9,brain,Frontal Cortex ,frontalcortexba9,frontalcortexba9,108,120,EEEE00,Brain,Frontal cortex
+,,,,,,,,,,,
+Brain - Hippocampus,brain_hippocampus,hippocampus,brain,Hippocampus,hippocampus,hippocampus,94,103,EEEE00,Brain,Hippocampus
+,,,,,,,,,,,
+Brain - Hypothalamus,brain_hypothalamus,hypothalamus,brain,Hypothalamus,hypothalamus,hypothalamus,96,104,EEEE00,Brain,Hypothalamus
+,,,,,,,,,,,
+Brain - Nucleus accumbens (basal ganglia),brain_nucleus_accumbens_basal_ganglia,nucleus_accumbens_basal_ganglia,brain,Nucleus accumbens,nucleusaccumbensbasalganglia,nucleusaccumbensbasalganglia,113,123,EEEE00,Brain,Nucleus accumbens basal ganglia
+,,,,,,,,,,,
+Brain - Putamen (basal ganglia),brain_putamen_basal_ganglia,putamen_basal_ganglia,brain,Putamen,putamenbasalganglia,putamenbasalganglia,97,103,EEEE00,Brain,Putamen basal ganglia
+,,,,,,,,,,,
+Brain - Spinal cord (cervical c-1),brain_spinal_cord_cervical_c_1,spinal_cord_cervical_c_1,brain,Spinal cord,spinalcordcervicalc-1,spinalcordcervicalc1,71,76,EEEE00,Brain,Spinal cord cervical
+,,,,,,,,,,,
+Brain - Substantia nigra,brain_substantia_nigra,substantia_nigra,brain,Substantia nigra,substantianigra,substantianigra,63,71,EEEE00,Brain,Substantia nigra
+,,,,,,,,,,,
+Breast - Mammary Tissue,breast_mammary_tissue,breast_mammary_tissue,breast,Mammary tissue,breast_mammary_tissue,breastmammarytissue,214,218,33CCCC,Non-brain,Mammary tissue
+,,,,,,,,,,,
+Cells - EBV-transformed lymphocytes,cells_ebv_transformed_lymphocytes,cells_ebv_transformed_lymphocytes,cells,EBV-transformed lymphocytes,cells_ebv_transformed_lymphocytes,cellsebvtransformedlymphocytes,118,139,CC66FF,Non-brain,EBV-transformed lymphocytes
+,,,,,,,,,,,
+Cells - Leukemia cell line (CML),cells_leukemia_cell_line_cml,cells_leukemia_cell_line_cml,cells,Leukemia cell line (CML),cells_leukemia_cell_line_cml,cellsleukemiacelllinecml,NA,102,NA,Non-brain,Leukemia cell line (CML)
+,,,,,,,,,,,
+Cells - Transformed fibroblasts,cells_transformed_fibroblasts,cells_transformed_fibroblasts,cells,Transformed fibroblasts,cells_transformed_fibroblasts,cellstransformedfibroblasts,284,306,AAEEFF,Non-brain,Transformed fibroblasts
+,,,,,,,,,,,
+Cervix - Ectocervix,cervix__ectocervix,cervix__ectocervix,cervix,Ectocervix,cervix_ectocervix,cervixectocervix,6,6,NA,Non-brain,Ectocervix
+,,,,,,,,,,,
+Cervix - Endocervix,cervix_endocervix,cervix_endocervix,cervix,Endocervix,cervix_endocervix,cervixendocervix,5,5,NA,Non-brain,Endocervix
+,,,,,,,,,,,
+Colon - Sigmoid,colon_sigmoid,colon_sigmoid,colon,Sigmoid,colon_sigmoid,colonsigmoid,149,173,EEBB77,Non-brain,Colon-sigmoid
+,,,,,,,,,,,
+Colon - Transverse,colon_transverse,colon_transverse,colon,Transverse,colon_transverse,colontransverse,195,203,CC9955,Non-brain,Colon-transverse
+,,,,,,,,,,,
+Esophagus - Gastroesophageal Junction,esophagus_gastroesophageal_junction,esophagus_gastroesophageal_junction,esophagus,Gastroesophageal junction,esophagus_gastroesophageal_junction,esophagusgastroesophagealjunction,153,176,8B7355,Non-brain,Gastroesophageal junction
+,,,,,,,,,,,
+Esophagus - Mucosa,esophagus_mucosa,esophagus_mucosa,esophagus,Mucosa,esophagus_mucosa,esophagusmucosa,286,331,552200,Non-brain,Esophagus-mucosa
+,,,,,,,,,,,
+Esophagus - Muscularis,esophagus_muscularis,esophagus_muscularis,esophagus,Muscularis,esophagus_muscularis,esophagusmuscularis,247,283,BB9988,Non-brain,Esophagus-muscularis
+,,,,,,,,,,,
+Fallopian Tube,fallopian_tube,fallopian_tube,fallopian,Fallopian tube,fallopian_tube,fallopiantube,6,7,NA,Non-brain,Fallopian tube
+,,,,,,,,,,,
+Heart - Atrial Appendage,heart__atrial_appendage,heart_atrial_appendage,heart,Atrial appendage,heart_atrial_appendage,heartatrialappendage,194,218,9900FF,Non-brain,Atrial appendage
+,,,,,,,,,,,
+Heart - Left Ventricle,heart_left_ventricle,heart_left_ventricle,heart,Left ventricle,heart_left_ventricle,heartleftventricle,218,271,660099,Non-brain,Left ventricle
+,,,,,,,,,,,
+Kidney - Cortex,kidney_cortex,kidney_cortex,kidney,Kidney,kidney_cortex,kidneycortex,32,36,2AB2BA,Non-brain,Kidney
+,,,,,,,,,,,
+Liver,liver,liver,liver,Liver,liver,liver,118,136,AABB66,Non-brain,Liver
+,,,,,,,,,,,
+Lung,lung,lung,lung,Lung,lung,lung,320,374,99FF00,Non-brain,Lung
+,,,,,,,,,,,
+Minor Salivary Gland,minor_salivary_gland,minor_salivary_gland,minor,Minor salivary gland,minor_salivary_gland,minorsalivarygland,57,70,99BB88,Non-brain,Minor salivary gland
+,,,,,,,,,,,
+Muscle - Skeletal,muscle_skeletal,muscle_skeletal,muscle,Skeletal muscle,muscle_skeletal,muscleskeletal,430,475,AAAAFF,Non-brain,Skeletal muscle
+,,,,,,,,,,,
+Nerve - Tibial,nerve_tibial,nerve_tibial,nerve,Nerve - tibial,nerve_tibial,nervetibial,304,335,FFD700,Non-brain,Nerve-tibial
+,,,,,,,,,,,
+Ovary,ovary,ovary,ovary,Ovary,ovary,ovary,97,108,FFAAFF,Non-brain,Ovary
+,,,,,,,,,,,
+Pancreas,pancreas,pancreas,pancreas,Pancreas,pancreas,pancreas,170,197,995522,Non-brain,Pancreas
+,,,,,,,,,,,
+Pituitary,pituitary,pituitary,pituitary,Pituitary,pituitary,pituitary,103,124,AAFF99,Non-brain,Pituitary
+,,,,,,,,,,,
+Prostate,prostate,prostate,prostate,Prostate,prostate,prostate,106,119,DDDDDD,Non-brain,Prostate
+,,,,,,,,,,,
+Skin - Not Sun Exposed (Suprapubic),skin_not_sun_exposed_suprapubic,skin_not_sun_exposed_suprapubic,skin,Skin (suprapubic),skin_not_sun_exposed_suprapubic,skinnotsunexposedsuprapubic,250,271,0000FF,Non-brain,Skin (suprapubic)
+,,,,,,,,,,,
+Skin - Sun Exposed (Lower leg),skin_sun_exposed_lower_leg,skin_sun_exposed_lower_leg,skin,Skin (lower leg),skin_sun_exposed_lower_leg,skinsunexposedlowerleg,357,397,7777FF,Non-brain,Skin (lower leg)
+,,,,,,,,,,,
+Small Intestine - Terminal Ileum,small_intestine_terminal_ileum,small_intestine_terminal_ileum,small,Small Intestine,small_intestine_terminal_ileum,smallintestineterminalileum,88,104,555522,Non-brain,Small intestine
+,,,,,,,,,,,
+Spleen,spleen,spleen,spleen,Spleen,spleen,spleen,104,118,778855,Non-brain,Spleen
+,,,,,,,,,,,
+Stomach,stomach,stomach,stomach,Stomach,stomach,stomach,193,204,FFDD99,Non-brain,Stomach
+,,,,,,,,,,,
+Testis,testis,testis,testis,Testis,testis,testis,172,203,AAAAAA,Non-brain,Testis
+,,,,,,,,,,,
+Thyroid,thyroid,thyroid,thyroid,Thyroid,thyroid,thyroid,323,361,006600,Non-brain,Thyroid
+,,,,,,,,,,,
+Uterus,uterus,uterus,uterus,Uterus,uterus,uterus,83,90,FF66FF,Non-brain,Uterus
+,,,,,,,,,,,
+Vagina,vagina,vagina,vagina,Vagina,vagina,vagina,96,97,FF5599,Non-brain,Vagina
+,,,,,,,,,,,
+Whole Blood,whole_blood,whole_blood,whole,Whole blood,whole_blood,wholeblood,393,456,FF00BB,Non-brain,Whole blood

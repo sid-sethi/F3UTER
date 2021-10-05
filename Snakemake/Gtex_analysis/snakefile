@@ -1,0 +1,1063 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+er_dir = config["er_dir"]
+
+
+tissue_names = [
+  "adipose_subcutaneous",
+  "adrenal_gland",
+  "artery_aorta",
+  "artery_coronary",
+  "artery_tibial",
+  "adipose_visceral_omentum",
+  "brain_amygdala",
+  "brain_anterior_cingulate_cortex_ba24",
+  "brain_caudate_basal_ganglia",
+  "brain_cerebellar_hemisphere",
+  "brain_frontal_cortex_ba9",
+  "brain_hippocampus",
+  "brain_hypothalamus",
+  "brain_nucleus_accumbens_basal_ganglia",
+  "brain_putamen_basal_ganglia",
+  "brain_spinal_cord_cervical_c_1",
+  "brain_substantia_nigra",
+  "colon_sigmoid",
+  "colon_transverse",
+  "esophagus_gastroesophageal_junction",
+  "esophagus_mucosa",
+  "esophagus_muscularis",
+  "heart_atrial_appendage",
+  "heart_left_ventricle",
+  "kidney_cortex",
+  "liver",
+  "lung",
+  "minor_salivary_gland",
+  "muscle_skeletal",
+  "nerve_tibial",
+  "pancreas",
+  "pituitary",
+  "skin_not_sun_exposed_suprapubic",
+  "skin_sun_exposed_lower_leg",
+  "small_intestine_terminal_ileum",
+  "spleen",
+  "stomach",
+  "thyroid",
+  "whole_blood"
+]
+
+
+groups = ["Tis_spec/all_tisSpec", "Brain_spec/all_brainSpec", "Shared/all_sharedId", "Ambiguous/all_ambigs"]
+
+groups_2 = ["all.pos"]
+
+ens_db = ["Ensembl_v92", "Ensembl_v104"]
+
+miura_list = ["precise", "confident", "candidate"]
+
+gene_list = ["all_brainSpec_pos", "all_brainSpec_neg"]
+
+
+iter = list(range(1,11))
+
+
+rule all:
+    input:
+        expand("Gtex_expressed_genes/{tissue}.txt", tissue=tissue_names),
+        expand("ER_data_processed/3prime/{tissue}.txt", tissue=tissue_names),
+        expand("ER_data_processed/3prime_wo_length_filter/{tissue}.txt", tissue=tissue_names),
+        expand("ER_data_processed/Stats/{tissue}.txt", tissue=tissue_names),
+        "ER_data_processed/numbers.txt",
+        "ER_data_processed/Plots/scatter_numbers_vs_totalLength.png",
+
+        expand("F3UTER_features/Nt_freq/{tissue}_nt_freq.txt", tissue=tissue_names),
+        expand("F3UTER_features/Phastcons/{tissue}_phastcons.txt", tissue=tissue_names),
+        expand("F3UTER_features/PAS/{tissue}_polyA_signal.txt", tissue=tissue_names),
+        expand("F3UTER_features/Structural_properties/{tissue}_structural_feat.txt", tissue=tissue_names),
+        expand("F3UTER_features/Transposons/{tissue}_repeats.txt", tissue=tissue_names),
+        expand("F3UTER_features/Expression/{tissue}_exp_feat.txt", tissue=tissue_names),
+        expand("ML_tables/table_{tissue}.rds", tissue = tissue_names),
+
+        expand("Prediction/{tissue}.pred.txt", tissue = tissue_names),
+        expand("App_data/{tissue}_appData.rds", tissue = tissue_names),
+        "App_data_merged/all_tissues_appData.rds",
+        "Prediction_numbers/numbers.txt",
+        "Split_read_numbers/all_tissues_splitread_percentage.png",
+        "Split_read_numbers/ER_distance_and_nearest_gene.txt",
+        "ER_gene_association/stats_overlapping_genes_effect.txt",
+        "Split_read_numbers/gene_splitread_pertissue.png",
+
+        expand("UTR_tissue_specificity/Meancov/{tissue}_meancov.txt", tissue=tissue_names),
+        "UTR_tissue_specificity/utr_tissue_specificity_results.txt",
+
+        "CNC_analysis/cnc_density_all_predictions.png",
+        expand("CNC_analysis/{group_name}_cnc.txt", group_name=groups),
+        "CNC_analysis/cnc_density_groups.png",
+
+        "ER_tissue_specificity/Plots/numbers_brain_spec_highProb.png",
+        expand("ER_tissue_specificity/{group_name}_pos_genes.txt", group_name=groups),
+
+        # get Fasta
+        "Fasta/brainSpec.pos.fasta",
+        "Fasta/brainSpec.pos.shuf.fasta",
+
+        # get RDS
+        "Rds_ers/all.pos.rds",
+
+        "ER_tissue_specificity/predicted_threePrime_vs_utr_length_FC.txt",
+
+        expand("ER_refAnno_comparison/{db_dataset}/{group_name}_ers_ensembl.txt", db_dataset=ens_db, group_name=groups_2),
+        expand("ER_refAnno_comparison/Gencode_v38/{group_name}_ers_gencode.txt", group_name=groups_2),
+        expand("ER_refAnno_comparison/Refseq_v109/{group_name}_ers_refseq.txt", group_name=groups_2),
+        expand("ER_refAnno_comparison/Miura_et_al/{list}/{group_name}_ers_miura.txt", list=miura_list, group_name=groups_2),
+        "ER_refAnno_comparison/Plots/all_miura_overlap.png",
+        "ER_refAnno_comparison/Plots/number_annotated_predictions_perTissue.png",
+
+        expand("HypergeometricTests/VsOmim/{gene_group}_hyperRes.png", gene_group=gene_list),
+        expand("HypergeometricTests/VsGenomicsEngland/{gene_group}_hyperRes.png", gene_group=gene_list),
+
+        expand("Ucsc_beds/{tissue}.bed", tissue=tissue_names),
+        "Ucsc_beds/miura_brain.bed",
+
+        "ER_tissue_specificity/Brain_spec/ClusterProfiler/all_brainSpec_pos_genes_GO.txt",
+        "ER_tissue_specificity/Brain_spec/ClusterProfiler/compareClusterRes.png"
+
+
+#########################################################################
+
+
+
+#################### Processing of raw ER data ######################
+
+# extracting expressed genes in each tissue from GTEX data
+rule extract_expressed_genes:
+    input:
+        gtex_file = SNAKEDIR + "/data/GTEx_Analysis_v6p_RNA-seq_RNA-SeQCv1.1.8_gene_median_rpkm.gct"
+
+    output:
+        table = expand("Gtex_expressed_genes/{tissue}.txt", tissue=tissue_names)
+
+    params:
+        resPath = "Gtex_expressed_genes",
+        script = SNAKEDIR + "/scripts/extract_gtex_expressed_genes.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.gtex_file} {params.resPath}
+        """
+
+
+rule generate_er_dataset:
+    input:
+        er_file = er_dir + "/{tissue}.txt",
+        gtf_file = config["gtf_file"],
+        expressed_transcript_file = "Gtex_expressed_genes/{tissue}.txt"
+
+    output:
+        three_prime = "ER_data_processed/3prime/{tissue}.txt",
+        five_prime = "ER_data_processed/5prime/{tissue}.txt",
+        three_prime_v2 = "ER_data_processed/3prime_wo_length_filter/{tissue}.txt",
+        five_prime_v2 = "ER_data_processed/5prime_wo_length_filter/{tissue}.txt",
+        stats = "ER_data_processed/Stats/{tissue}.txt"
+
+    params:
+        resPath = "ER_data_processed",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/generate_er_dataset.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.er_file} {input.gtf_file} {input.expressed_transcript_file} {params.resPath} {params.prefix}
+        """
+
+
+rule er_processing_numbers:
+    input:
+        data = expand("ER_data_processed/Stats/{tissue}.txt", tissue=tissue_names)
+
+    output:
+        res = "ER_data_processed/numbers.txt"
+
+    params:
+        stats_dir = "ER_data_processed/Stats",
+        resPath = "ER_data_processed",
+        script = SNAKEDIR + "/scripts/er_processing_numbers.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.stats_dir} {params.resPath}
+        """
+
+
+rule er_intial_plots:
+    input:
+        data_1 = expand("ER_data_processed/3prime_wo_length_filter/{tissue}.txt", tissue=tissue_names),
+        data_2 = expand("ER_data_processed/5prime_wo_length_filter/{tissue}.txt", tissue=tissue_names),
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        p1 = "ER_data_processed/Plots/3_prime_vs_5_prime.png",
+        p2 = "ER_data_processed/Plots/scatter_numbers_vs_totalLength.png"
+
+    params:
+        three_prime_dir = "ER_data_processed/3prime_wo_length_filter",
+        five_prime_dir = "ER_data_processed/5prime_wo_length_filter",
+        resPath = "ER_data_processed/Plots",
+        script = SNAKEDIR + "/scripts/plot_er_initial_graphs.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.three_prime_dir} {params.five_prime_dir} {input.formatting_csv} {params.resPath}
+        """
+
+
+
+########################## Generating F3UTER features ##############################
+
+rule cal_nt_freq:
+    """
+    Calculate nucleotide frequency features
+    """
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt"
+
+    output:
+        out = "F3UTER_features/Nt_freq/{tissue}_nt_freq.txt"
+
+    params:
+        resPath = "F3UTER_features/Nt_freq",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/nt_freq.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+rule cal_phastcons:
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt",
+        bw = config["phastcons"]
+
+    output:
+        out = "F3UTER_features/Phastcons/{tissue}_phastcons.txt"
+
+    params:
+        resPath = "F3UTER_features/Phastcons",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/phastCons.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {input.bw}
+        """
+
+
+rule cal_pas:
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt"
+
+    output:
+        out = "F3UTER_features/PAS/{tissue}_polyA_signal.txt"
+
+    params:
+        resPath = "F3UTER_features/PAS",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/polyA_signal.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+rule cal_structural_feat:
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt"
+
+    output:
+        out = "F3UTER_features/Structural_properties/{tissue}_structural_feat.txt"
+
+    params:
+        resPath = "F3UTER_features/Structural_properties",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/structural_feat.R",
+        conversion_tables = SNAKEDIR + "/data/dna_structural_conversion_tables"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {params.conversion_tables}
+        """
+
+
+rule cal_repeats:
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt",
+        repeats_data = config["repeats"]
+
+    output:
+        out = "F3UTER_features/Transposons/{tissue}_repeats.txt"
+
+    params:
+        resPath = "F3UTER_features/Transposons",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/repeats.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {input.repeats_data}
+        """
+
+
+
+rule cal_exp_feat:
+    input:
+        ers = "ER_data_processed/3prime/{tissue}.txt"
+
+    output:
+        out = "F3UTER_features/Expression/{tissue}_exp_feat.txt"
+
+    params:
+        coverage_dir = config["coverage_dir"] + "/{tissue}",
+        resPath = "F3UTER_features/Expression",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/exp_features.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {params.coverage_dir}
+        """
+
+
+####################################################
+
+
+rule make_ml_table:
+    input:
+        nt = "F3UTER_features/Nt_freq/{tissue}_nt_freq.txt",
+        phast = "F3UTER_features/Phastcons/{tissue}_phastcons.txt",
+        pas = "F3UTER_features/PAS/{tissue}_polyA_signal.txt",
+        repeats = "F3UTER_features/Transposons/{tissue}_repeats.txt",
+        structProp = "F3UTER_features/Structural_properties/{tissue}_structural_feat.txt",
+        exp = "F3UTER_features/Expression/{tissue}_exp_feat.txt"
+
+    output:
+        table = "ML_tables/table_{tissue}.rds"
+
+    params:
+        features_dir = "F3UTER_features",
+        resPath = "ML_tables",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/make_ml_table.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.features_dir} {params.resPath} {params.prefix}
+        """
+
+
+
+rule make_predictions:
+    input:
+        table = "ML_tables/table_{tissue}.rds",
+        model = SNAKEDIR + "/data/rf_model.rda"
+
+    output:
+        table = "Prediction/{tissue}.pred.txt"
+
+    params:
+        resPath = "Prediction",
+        tissue = "{tissue}",
+        script = SNAKEDIR + "/scripts/make_predictions.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.table} {input.model} {params.resPath} {params.tissue}
+        """
+
+
+
+rule make_app_data:
+    input:
+        preds = "Prediction/{tissue}.pred.txt"
+
+    output:
+        appData = "App_data/{tissue}_appData.rds"
+
+    params:
+        erPath = "ER_data_processed/3prime",
+        resPath = "App_data",
+        tissue = "{tissue}",
+        script = SNAKEDIR + "/scripts/make_app_data.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.preds} {params.erPath} {params.resPath} {params.tissue}
+        """
+
+
+
+rule combine_app_data:
+    input:
+        rds = expand("App_data/{tissue}_appData.rds", tissue = tissue_names)
+
+    output:
+        appData = "App_data_merged/all_tissues_appData.rds"
+
+    params:
+        app_dir = "App_data",
+        resPath = "App_data_merged",
+        script = SNAKEDIR + "/scripts/combine_app_data.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.app_dir} {params.resPath}
+        """
+
+
+
+rule make_predictions_plot:
+    input:
+        rds = expand("App_data/{tissue}_appData.rds", tissue = tissue_names),
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        txt = "Prediction_numbers/numbers.txt",
+        p1 = "Prediction_numbers/number_predictions_allProb.png",
+        p2 = "Prediction_numbers/length_predictions_allProb.png",
+        p3 = "Prediction_numbers/number_predictions_highProb.png",
+        p4 = "Prediction_numbers/length_predictions_highProb.png",
+        p5 = "Prediction_numbers/gene_predictions_highProb.png",
+        p6 = "Prediction_numbers/gene_predictions_numbers.png"
+
+
+    params:
+        app_dir = "App_data",
+        resPath = "Prediction_numbers",
+        script = SNAKEDIR + "/scripts/plot_prediction_numbers.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.app_dir} {input.formatting_csv} {params.resPath}
+        """
+
+
+
+
+rule split_read_plots:
+    input:
+        merged_data = rules.combine_app_data.output.appData,
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        p1 = "Split_read_numbers/all_tissues_splitread_percentage.png",
+        t1 = "Split_read_numbers/all_tissues_splitread_percentage.txt",
+        t2 = "Split_read_numbers/overall_splitread_percentage.txt",
+        p2 = "Split_read_numbers/gene_splitread_pertissue.png",
+        t3 = "Split_read_numbers/genes_with_atleast_one_splitread.txt",
+        p3 = "Split_read_numbers/distance_density_splitread.png",
+        t4 = "Split_read_numbers/ER_distance_and_nearest_gene.txt"
+
+    params:
+        app_dir = "App_data",
+        resPath = "Split_read_numbers",
+        script = SNAKEDIR + "/scripts/plot_split_read_numbers.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.merged_data} {params.app_dir} {input.formatting_csv} {params.resPath}
+        """
+
+
+
+rule effect_of_overlapping_genes:
+    input:
+        merged_data = rules.combine_app_data.output.appData,
+        gtf = config["gtf_file"]
+
+    output:
+        f1 = "ER_gene_association/stats_overlapping_genes_effect.txt"
+
+    params:
+        resPath = "ER_gene_association",
+        script = SNAKEDIR + "/scripts/overlap_other_genes.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.merged_data} {input.gtf} {params.resPath}
+        """
+
+
+################################################################
+######### compare ERs with latest annotations ##################
+################################################################
+
+
+rule compare_ers_with_ensembl:
+    input:
+        gtf_file = SNAKEDIR + "/data/{db_dataset}.gtf",
+        er_file = "Rds_ers/{group_name}.rds"
+
+
+    output:
+        f1 = "ER_refAnno_comparison/{db_dataset}/{group_name}_overlap_ensembl.txt",
+        f2 = "ER_refAnno_comparison/{db_dataset}/{group_name}_biotype_ensembl.txt",
+        f3 = "ER_refAnno_comparison/{db_dataset}/{group_name}_tsl_ensembl.txt",
+        f4 = "ER_refAnno_comparison/{db_dataset}/{group_name}_ers_ensembl.txt",
+
+    params:
+        resPath = "ER_refAnno_comparison/{db_dataset}",
+        prefix = "{group_name}",
+        dataset_name = "{db_dataset}",
+        script = SNAKEDIR + "/scripts/compare_ers_with_ensembl.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.gtf_file} {input.er_file} {params.resPath} {params.prefix} {params.dataset_name}
+        """
+
+
+rule compare_ers_with_gencode:
+    input:
+        gtf_file = SNAKEDIR + "/data/Gencode_v38.gtf",
+        er_file = "Rds_ers/{group_name}.rds"
+
+
+    output:
+        f1 = "ER_refAnno_comparison/Gencode_v38/{group_name}_overlap_gencode.txt",
+        f2 = "ER_refAnno_comparison/Gencode_v38/{group_name}_biotype_gencode.txt",
+        f3 = "ER_refAnno_comparison/Gencode_v38/{group_name}_tsl_gencode.txt",
+        f4 = "ER_refAnno_comparison/Gencode_v38/{group_name}_ers_gencode.txt"
+
+    params:
+        resPath = "ER_refAnno_comparison/Gencode_v38",
+        prefix = "{group_name}",
+        dataset_name = "Gencode_v38",
+        script = SNAKEDIR + "/scripts/compare_ers_with_gencode.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.gtf_file} {input.er_file} {params.resPath} {params.prefix} {params.dataset_name}
+        """
+
+
+
+rule compare_ers_with_refseq:
+    input:
+        gtf_file = SNAKEDIR + "/data/refseq_curated_v109_three_prime.bed",
+        er_file = "Rds_ers/{group_name}.rds"
+
+
+    output:
+        f1 = "ER_refAnno_comparison/Refseq_v109/{group_name}_overlap_refseq.txt",
+        f4 = "ER_refAnno_comparison/Refseq_v109/{group_name}_ers_refseq.txt"
+
+    params:
+        resPath = "ER_refAnno_comparison/Refseq_v109",
+        prefix = "{group_name}",
+        dataset_name = "Refseq_v109",
+        script = SNAKEDIR + "/scripts/compare_ers_with_refseq.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.gtf_file} {input.er_file} {params.resPath} {params.prefix} {params.dataset_name}
+        """
+
+
+rule compare_ers_with_miura:
+    input:
+        gtf_file = SNAKEDIR + "/data/Miura_et_al/{list}_list_hg38.bed",
+        er_file = "Rds_ers/{group_name}.rds",
+        tissue_mapping = SNAKEDIR + "/data/Miura_et_al/er_tissue_mapping.csv"
+
+
+    output:
+        f1 = "ER_refAnno_comparison/Miura_et_al/{list}/{group_name}_overlap_miura.txt",
+        f4 = "ER_refAnno_comparison/Miura_et_al/{list}/{group_name}_ers_miura.txt"
+
+    params:
+        resPath = "ER_refAnno_comparison/Miura_et_al/{list}",
+        prefix = "{group_name}",
+        dataset_name = "{list}",
+        script = SNAKEDIR + "/scripts/compare_ers_with_miura.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.gtf_file} {input.er_file} {params.resPath} {params.prefix} {params.dataset_name} {input.tissue_mapping}
+        """
+
+
+
+rule plot_compare_ers_with_reference:
+    input:
+        f1 = expand("ER_refAnno_comparison/{db_dataset}/{group_name}_ers_ensembl.txt", db_dataset=ens_db, group_name=groups_2),
+        f2 = expand("ER_refAnno_comparison/Gencode_v38/{group_name}_ers_gencode.txt", group_name=groups_2),
+        f3 = expand("ER_refAnno_comparison/Refseq_v109/{group_name}_ers_refseq.txt", group_name=groups_2),
+        f4 = expand("ER_refAnno_comparison/Miura_et_al/{list}/{group_name}_ers_miura.txt", list=miura_list, group_name=groups_2),
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        f1 = "ER_refAnno_comparison/Plots/number_annotated_predictions_perTissue.png",
+        f2 = "ER_refAnno_comparison/Plots/all_miura_overlap.png"
+
+    params:
+        res_dir = "ER_refAnno_comparison",
+        resPath = "ER_refAnno_comparison/Plots",
+        script = SNAKEDIR + "/scripts/plot_compare_ers_with_reference.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.res_dir} {params.resPath} {input.formatting_csv}
+        """
+
+
+##################################################
+# Known 3'UTR tissue-specificity categorisation ##
+##################################################
+
+rule cal_utr_meancov:
+    input:
+        three_prime_data = SNAKEDIR + "/data/three_prime.RData"
+
+    output:
+        out = "UTR_tissue_specificity/Meancov/{tissue}_meancov.txt"
+
+    params:
+        coverage_dir = config["coverage_dir"] + "/{tissue}",
+        resPath = "UTR_tissue_specificity/Meancov",
+        prefix = "{tissue}",
+        script = SNAKEDIR + "/scripts/three_prime_meancov.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.three_prime_data} {params.resPath} {params.prefix} {params.coverage_dir}
+        """
+
+
+
+rule cal_utr_tissue_specificity:
+    input:
+        res = expand("UTR_tissue_specificity/Meancov/{tissue}_meancov.txt", tissue=tissue_names)
+
+    output:
+        out = "UTR_tissue_specificity/utr_tissue_specificity_results.txt"
+
+    params:
+        meancov_dir = "UTR_tissue_specificity/Meancov",
+        resPath = "UTR_tissue_specificity",
+        script = SNAKEDIR + "/scripts/utr_tissue_specificity.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.meancov_dir} {params.resPath}
+        """
+
+
+
+##################################################
+############# CNCR analysis ######################
+#################################################
+
+rule cnc_known_utrs:
+    input:
+        cnc_data = SNAKEDIR + "/data/CNC_gr.rda",
+        three_prime_data = SNAKEDIR + "/data/three_prime.RData"
+
+    output:
+        cnc = "CNC_analysis/cncr_scores_known_three_utrs.txt"
+
+    params:
+        resPath = "CNC_analysis",
+        script = SNAKEDIR + "/scripts/cnc_scores_known_utrs.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.cnc_data} {input.three_prime_data} {params.resPath}
+        """
+
+
+
+rule cnc_all:
+    input:
+        all_appData = rules.combine_app_data.output.appData,
+        cnc_data = SNAKEDIR + "/data/CNC_gr.rda"
+
+    output:
+        cnc = "CNC_analysis/cncr_all_predictions.txt"
+
+    params:
+        resPath = "CNC_analysis",
+        script = SNAKEDIR + "/scripts/cnc_all_predictions.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.all_appData} {input.cnc_data} {params.resPath}
+        """
+
+
+
+rule plot_cnc_all:
+    input:
+        cnc_all = rules.cnc_all.output.cnc,
+        cnc_known = rules.cnc_known_utrs.output.cnc,
+        utr_tissue_specificity = rules.cal_utr_tissue_specificity.output.out
+
+    output:
+        png = "CNC_analysis/cnc_density_all_predictions.png"
+
+    params:
+        resPath = "CNC_analysis",
+        script = SNAKEDIR + "/scripts/plot_cnc_all_predictions.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.cnc_all} {input.cnc_known} {params.resPath} {input.utr_tissue_specificity}
+        """
+
+
+# ########################################################################
+
+##=== tissue-specificity ###################
+
+rule cal_er_tissue_specificity:
+    input:
+        app_data_merged = rules.combine_app_data.output.appData,
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        f1 = expand("ER_tissue_specificity/ER_tissue_specificity_data/{tissue}_res.rds", tissue = tissue_names),
+        f2 = "ER_tissue_specificity/Tis_spec/all_tisSpec.rds",
+        f3 = "ER_tissue_specificity/Brain_spec/all_brainSpec.rds",
+        f4 = "ER_tissue_specificity/Shared/all_sharedId.rds",
+        f5 = "ER_tissue_specificity/Ambiguous/all_ambigs.rds",
+        f6 = "ER_tissue_specificity/Shared/all_corData.rds",
+        f7 = "ER_tissue_specificity/all_numbers.rds"
+
+    params:
+        app_dir = "App_data",
+        resPath = "ER_tissue_specificity",
+        script = SNAKEDIR + "/scripts/er_tissue_specificity.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.app_data_merged} {params.app_dir} {input.formatting_csv} {params.resPath}
+        """
+
+
+rule er_tissue_specificity_plots:
+    input:
+        cor_data = rules.cal_er_tissue_specificity.output.f6,
+        numbers_data = rules.cal_er_tissue_specificity.output.f7,
+        formatting_csv = SNAKEDIR + "/data/OMIM_gtex_tissue_name_formatting.csv"
+
+    output:
+        f1 = "ER_tissue_specificity/Plots/number_tis_spec_allProb.png",
+        f2 = "ER_tissue_specificity/Plots/number_brain_spec_allProb.png",
+        f3 = "ER_tissue_specificity/Plots/number_shared_allProb.png",
+        f4 = "ER_tissue_specificity/Plots/numbers_tis_spec_highProb.png",
+        f5 = "ER_tissue_specificity/Plots/numbers_brain_spec_highProb.png",
+        f6 = "ER_tissue_specificity/Plots/numbers_shared_highProb.png"
+
+    params:
+        resPath = "ER_tissue_specificity/Plots",
+        script = SNAKEDIR + "/scripts/er_tissue_specificity_plots.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.numbers_data} {input.cor_data} {input.formatting_csv} {params.resPath}
+        """
+
+
+
+rule make_gene_lists:
+    input:
+        groupData = "ER_tissue_specificity/{group_name}.rds",
+        gtf_file = config["gtf_file"]
+
+
+    output:
+        f1 = "ER_tissue_specificity/{group_name}_pos_genes.txt",
+        f2 = "ER_tissue_specificity/{group_name}_neg_genes.txt"
+
+    params:
+        resPath = "ER_tissue_specificity",
+        prefix = "{group_name}",
+        script = SNAKEDIR + "/scripts/make_gene_lists.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.groupData} {input.gtf_file} {params.resPath} {params.prefix}
+        """
+
+
+
+
+rule cnc_groups:
+    input:
+        groupData = "ER_tissue_specificity/{group_name}.rds",
+        cnc_data = SNAKEDIR + "/data/CNC_gr.rda"
+
+    output:
+        cnc = "CNC_analysis/{group_name}_cnc.txt"
+
+    params:
+        resPath = "CNC_analysis",
+        prefix = "{group_name}",
+        script = SNAKEDIR + "/scripts/cnc_groups.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.groupData} {input.cnc_data} {params.resPath} {params.prefix}
+        """
+
+
+rule plot_cnc_groups:
+    input:
+        cnc_groups = expand("CNC_analysis/{group_name}_cnc.txt", group_name=groups),
+        bs = "CNC_analysis/Brain_spec/all_brainSpec_cnc.txt",
+        ts = "CNC_analysis/Tis_spec/all_tisSpec_cnc.txt",
+        s = "CNC_analysis/Shared/all_sharedId_cnc.txt",
+        cnc_known = rules.cnc_known_utrs.output.cnc,
+        utr_tissue_specificity = rules.cal_utr_tissue_specificity.output.out
+
+    output:
+        png = "CNC_analysis/cnc_density_groups.png"
+
+    params:
+        resPath = "CNC_analysis",
+        script = SNAKEDIR + "/scripts/plot_cnc_groups.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.bs} {input.ts} {input.s} {input.cnc_known} {params.resPath} {input.utr_tissue_specificity}
+        """
+
+
+
+##############################################
+### generate fasta sequences #################
+##############################################
+
+rule generate_fasta:
+    input:
+        app_data_merged = rules.combine_app_data.output.appData,
+        bs = rules.cal_er_tissue_specificity.output.f3,
+        ts = rules.cal_er_tissue_specificity.output.f2,
+        s = rules.cal_er_tissue_specificity.output.f4,
+        known_utrs = SNAKEDIR + "/data/three_prime.RData"
+
+    output:
+        f1 = "Fasta/all.pos.fasta",
+        f2 = "Fasta/all.neg.fasta",
+        f3 = "Fasta/brainSpec.pos.fasta",
+        f4 = "Fasta/brainSpec.neg.fasta",
+        f5 = "Fasta/tisSpec.pos.fasta",
+        f6 = "Fasta/tisSpec.neg.fasta",
+        f7 = "Fasta/shared.pos.fasta",
+        f8 = "Fasta/shared.neg.fasta",
+        f9 = "Fasta/known_utrs.fasta",
+        f10 = "Fasta/all.pos.shuf.fasta",
+        f11 = "Fasta/brainSpec.pos.shuf.fasta",
+        f12 = "Fasta/tisSpec.pos.shuf.fasta",
+        f13 = "Fasta/shared.pos.shuf.fasta"
+
+    params:
+        resPath = "Fasta",
+        script = SNAKEDIR + "/scripts/get_fasta_ers.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.app_data_merged} {input.bs} {input.ts} {input.s} {input.known_utrs} {params.resPath}
+        """
+
+
+##############################################
+### generate RDS-groups #################
+##############################################
+
+rule generate_rds_ers:
+    input:
+        app_data_merged = rules.combine_app_data.output.appData,
+        bs = rules.cal_er_tissue_specificity.output.f3,
+        ts = rules.cal_er_tissue_specificity.output.f2,
+        s = rules.cal_er_tissue_specificity.output.f4,
+        known_utrs = SNAKEDIR + "/data/three_prime.RData",
+        utr_tissue_specificity = "UTR_tissue_specificity/utr_tissue_specificity_results.txt"
+
+    output:
+        f1 = "Rds_ers/all.pos.rds",
+        f2 = "Rds_ers/all.neg.rds",
+        f3 = "Rds_ers/brainSpec.pos.rds",
+        f4 = "Rds_ers/brainSpec.neg.rds",
+        f5 = "Rds_ers/tisSpec.pos.rds",
+        f6 = "Rds_ers/tisSpec.neg.rds",
+        f7 = "Rds_ers/shared.pos.rds",
+        f8 = "Rds_ers/shared.neg.rds",
+        f9 = "Rds_ers/known_utrs.rds"
+
+    params:
+        resPath = "Rds_ers",
+        script = SNAKEDIR + "/scripts/get_rds_ers.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.app_data_merged} {input.bs} {input.ts} {input.s} {input.known_utrs} {input.utr_tissue_specificity} {params.resPath}
+        """
+
+
+
+################################################################
+### Predicted 3'UTR length vs known UTR length #################
+################################################################
+
+rule calculate_length_fold_change:
+    input:
+        gtf_file = config["gtf_file"],
+        bs = rules.generate_rds_ers.output.f3,
+        ts = rules.generate_rds_ers.output.f5,
+        s = rules.generate_rds_ers.output.f7
+
+
+    output:
+        f1 = "ER_tissue_specificity/predicted_threePrime_vs_utr_length_FC.txt",
+        f2 = "ER_tissue_specificity/predicted_threePrime_vs_utr_length_ecdf.png"
+
+    params:
+        res_dir = "Rds_ers",
+        resPath = "ER_tissue_specificity",
+        script = SNAKEDIR + "/scripts/prediction_vs_known_utr_length.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.res_dir} {input.gtf_file} {params.resPath}
+        """
+
+
+##################################################
+########### Hypergeometric tests #################
+##################################################
+
+rule brain_vs_omim:
+    input:
+        filea = "ER_tissue_specificity/Brain_spec/{gene_group}_genes.txt",
+        fileb = SNAKEDIR + "/data/OMIM_data.csv",
+        universe = SNAKEDIR + "/data/syngo_brain_background.txt"
+
+    output:
+        f1 = "HypergeometricTests/VsOmim/{gene_group}.overlap.txt",
+        f2 = "HypergeometricTests/VsOmim/{gene_group}_fisherRes.txt",
+        f3 = "HypergeometricTests/VsOmim/{gene_group}_hyperRes.txt",
+        f4 = "HypergeometricTests/VsOmim/{gene_group}_hyperRes.png"
+
+    params:
+        prefix = "{gene_group}",
+        resPath = "HypergeometricTests/VsOmim",
+        script = SNAKEDIR + "/scripts/omim_overlap_significance.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.filea} {input.fileb} {input.universe} {params.resPath} {params.prefix}
+        """
+
+
+
+rule brain_vs_GE:
+    input:
+        filea = "ER_tissue_specificity/Brain_spec/{gene_group}_genes.txt",
+        fileb = SNAKEDIR + "/data/NeurodegenerativeDisorders_adultOnset_greenGenes.txt",
+        universe = SNAKEDIR + "/data/syngo_brain_background.txt"
+
+    output:
+        f1 = "HypergeometricTests/VsGenomicsEngland/{gene_group}.overlap.txt",
+        f2 = "HypergeometricTests/VsGenomicsEngland/{gene_group}_fisherRes.txt",
+        f3 = "HypergeometricTests/VsGenomicsEngland/{gene_group}_hyperRes.txt",
+        f4 = "HypergeometricTests/VsGenomicsEngland/{gene_group}_hyperRes.png"
+
+    params:
+        prefix = "{gene_group}",
+        resPath = "HypergeometricTests/VsGenomicsEngland",
+        script = SNAKEDIR + "/scripts/genomicsEngland_overlap_significance.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.filea} {input.fileb} {input.universe} {params.resPath} {params.prefix}
+        """
+
+
+
+##################################################
+########### make ucsc beds #################
+##################################################
+
+rule make_ucsc_bed_gtex:
+    input:
+        appData = "App_data/{tissue}_appData.rds"
+
+    output:
+        bed = "Ucsc_beds/{tissue}.bed"
+
+    params:
+        resPath = "Ucsc_beds",
+        tissue = "{tissue}",
+        script = SNAKEDIR + "/scripts/make_ucsc_bed_gtex.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.appData} {params.resPath} {params.tissue};
+        sed -i '1i track name="{params.tissue}" visibility=1 itemRgb="On"' {output.bed}
+        """
+
+
+rule make_ucsc_bed_miura:
+    output:
+        bed = "Ucsc_beds/miura_brain.bed"
+
+    params:
+        resPath = "Ucsc_beds",
+        miura_dir = SNAKEDIR + "/data/Miura_et_al",
+        script = SNAKEDIR + "/scripts/make_ucsc_bed_miura.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.miura_dir} {params.resPath};
+        sed -i '1i track name="Miura et al. (brain)" visibility=1 itemRgb="On"' {output.bed}
+        """
+
+
+
+
+##################################################
+########### ClusterProfiler #################
+##################################################
+
+rule clusterProfiler_GO:
+    input:
+        pos_list = "ER_tissue_specificity/Brain_spec/all_brainSpec_pos_genes.txt",
+        neg_list = "ER_tissue_specificity/Brain_spec/all_brainSpec_neg_genes.txt",
+        universe = SNAKEDIR + "/data/syngo_brain_background.txt"
+
+    output:
+        f1 = "ER_tissue_specificity/Brain_spec/ClusterProfiler/all_brainSpec_pos_genes_GO.txt",
+        f2 = "ER_tissue_specificity/Brain_spec/ClusterProfiler/all_brainSpec_neg_genes_GO.txt",
+        f3 = "ER_tissue_specificity/Brain_spec/ClusterProfiler/compareClusterRes.txt",
+        f4 = "ER_tissue_specificity/Brain_spec/ClusterProfiler/compareClusterRes.png"
+
+    params:
+        resPath = "ER_tissue_specificity/Brain_spec/ClusterProfiler",
+        script = SNAKEDIR + "/scripts/clusterProfiler.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.pos_list} {input.neg_list} {input.universe} {params.resPath}
+        """
