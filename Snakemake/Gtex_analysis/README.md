@@ -63,11 +63,6 @@ If you provide more than one core, independent snakemake rules will be processed
 ```bash
 snakemake --use-conda -n all
 ```
-Snakemake can be run to only install the required conda environments without running the full workflow. Subsequent runs with --use-conda will make use of the local environments without requiring internet access. This is suitable for running the pipeline offline.
-
-```bash
-snakemake --use-conda --conda-create-envs-only
-```
 
 ## Licence
 
