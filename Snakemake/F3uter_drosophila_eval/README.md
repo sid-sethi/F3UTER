@@ -1,4 +1,4 @@
-# Pipeline for reproducing F3UTER evaluation on drosophilla known 3'UTRs
+# Pipeline for reproducing F3UTER evaluation on drosophila known 3'UTRs
 
 This `snakemake` pipeline extracts known 3'UTRs from dm6 GTF, calculates omic features, makes 3'UTR predictions using F3UTER and evaluates its performance.
 
@@ -34,17 +34,17 @@ git clone --recursive https://github.com/sid-sethi/F3UTER.git
 Create conda environment for the pipeline which will install all the dependencies:
 
 ```bash
-cd F3UTER/Snakemake/F3UTER_drosophilla_eval
+cd F3UTER/Snakemake/F3UTER_drosophila_eval
 conda env create -f environment.yml
 ```
 
 ## Usage
 
-Edit `config.yml` to set up the working directory and input files/directories. `snakemake` command should be issued from within the pipeline directory. Please note that before you run any of the `snakemake` commands, you need to make sure that you activate the conda environment first using the command `conda activate pipeline_drosophilla_eval`.
+Edit `config.yml` to set up the working directory and input files/directories. `snakemake` command should be issued from within the pipeline directory. Please note that before you run any of the `snakemake` commands, you need to make sure that you activate the conda environment first using the command `conda activate pipeline_drosophila_eval`.
 
 ```bash
-cd F3UTER/Snakemake/F3UTER_drosophilla_eval
-conda activate pipeline_drosophilla_eval
+cd F3UTER/Snakemake/F3UTER_drosophila_eval
+conda activate pipeline_drosophila_eval
 snakemake --use-conda -j <num_cores> all
 ```
 If you provide more than one core, independent snakemake rules will be processed simultaneously. This pipeline uses 6 cores at most. It is a good idea to do a dry run (using -n parameter) to view what would be done by the pipeline before executing the pipeline.
