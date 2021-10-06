@@ -32,7 +32,7 @@ awk -F " " '{print $5" "$6" "$7" "$11}' hg38.fa.out | sed 1d > hg38.repeatMasker
 ## Depedencies
 
 - [miniconda](https://conda.io/miniconda.html)
-- The rest of the dependencies (snakemake R packages) are installed via conda.
+- The rest of the dependencies (snakemake and R packages) are installed via conda.
 
 ## Installation
 
