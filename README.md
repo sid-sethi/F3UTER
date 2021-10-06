@@ -12,6 +12,8 @@ This repository is distributed in the hope that it will be useful, but WITHOUT A
 
 # Using F3UTER
 
+Use the F3UTER app to query predictions associated with the genes of your interest: https://astx.shinyapps.io/F3UTER/
+
 The following snakemake pipelines can be used to Generate ERs, calculate omic features and produce 3'UTR predictions using F3UTER.
 
 - [Generate ERs](https://github.com/sid-sethi/Generate-ERs): Identify unannotated intergenic expressed regions (ERs) from RNA-seq data.
@@ -19,6 +21,17 @@ The following snakemake pipelines can be used to Generate ERs, calculate omic fe
 - [Generate F3UTER predictions](https://github.com/sid-sethi/Generate-F3UTER-predictions): Predict potentially unannotated 3'UTRs.
 - [Generate F3UTER predictions in mouse](https://github.com/sid-sethi/Generate-F3UTER-predictions-mouse): Predict potentially unannotated 3'UTRs in the mouse genome.
 
+# Reproducing results presented in the manuscript
+
+The majority of the analysis (including the plots) presented in the manuscript can be reproduced using the following `snakemake` pipelines below:
+
+- [F3uter_mouse_eval](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/F3uter_mouse_eval): Evaluates performance of F3UTER on mouse 3'UTRs.
+- [F3uter_drosophila_eval](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/F3uter_drosophila_eval): Evaluates performance of F3UTER on drosophila 3'UTRs.
+- [F3uter_zebrafish_eval](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/F3uter_zebrafish_eval): Evaluates performance of F3UTER on zebrafish 3'UTRs.
+- [F3uter_compare_3-seq](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/F3uter_compare_3-seq): Compares F3UTER predictions with paired 3'-end sequencing data.
+- [PAS_predictions](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/PAS_predictions): Predicting poly(A) sites within ERs using existing poly(A) site prediction tools.
+- [PAS_comapare_3-seq](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/PAS_comapare_3-seq): Compares poly(A) site predictions with paired 3'-end sequencing data.
+- [Gtex_analysis](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/Gtex_analysis): Applies F3UTER to ERs from 39 GTEx tissues and performs all downstream analysis.
 
 ## Analysis code associated with the F3UTER manuscript
 
