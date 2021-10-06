@@ -1,0 +1,248 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+# ----------------------------------------------------------------
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+sample = config["sample_name"]
+
+chr = ["2L", "2R", "3L", "3R", "4", "X", "Y"]
+
+# ----------------------------------------------------------------
+
+rule all:
+    input:
+        "Known_regions/" + sample + "_knownRegions.txt",
+        "F3UTER_features/" + sample + "_nt_freq.txt",
+        "F3UTER_features/" + sample + "_polyA_signal.txt",
+        "F3UTER_features/" + sample + "_repeats.txt",
+        "F3UTER_features/" + sample + "_phastcons.txt",
+        "F3UTER_features/" + sample + "_exp_feat.txt",
+        "F3UTER_prediction/" + sample + "_ml_table.rds",
+        "F3UTER_prediction/" + sample + "_prValues.mean.txt",
+        "F3UTER_prediction/" + sample + "_roc.png",
+        "F3UTER_prediction/" + sample + "_pr.png"
+
+
+
+#########################################################################
+
+rule extract_known_regions:
+    input:
+        gtf = config["gtf_file"]
+
+    output:
+        out = "Known_regions/" + sample + "_knownRegions.txt"
+
+    params:
+        resPath = "Known_regions",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/get_known_regions.R",
+        tpm_dir = config["tpm_dir"]
+
+    shell:
+        """
+        Rscript {params.script} {input.gtf} {params.resPath} {params.prefix} {params.tpm_dir}
+        """
+
+
+
+rule cal_nt_freq:
+    input:
+        ers = rules.extract_known_regions.output.out
+
+    output:
+        out = "F3UTER_features/" + sample + "_nt_freq.txt"
+
+    params:
+        resPath = "F3UTER_features",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/nt_freq.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+
+rule cal_pas:
+    input:
+        ers = rules.extract_known_regions.output.out
+
+    output:
+        out = "F3UTER_features/" + sample + "_polyA_signal.txt"
+
+    params:
+        resPath = "F3UTER_features",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/polyA_signal.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+
+rule cal_repeats:
+    input:
+        ers = rules.extract_known_regions.output.out,
+        repeats_data = config["repeats"]
+
+    output:
+        out = "F3UTER_features/" + sample + "_repeats.txt"
+
+    params:
+        resPath = "F3UTER_features",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/repeats.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {input.repeats_data}
+        """
+
+
+
+rule cal_phastcons:
+    input:
+        ers = rules.extract_known_regions.output.out,
+        bw = config["phastcons"]
+
+    output:
+        out = "F3UTER_features/" + sample + "_phastcons.txt"
+
+    params:
+        resPath = "F3UTER_features",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/phastCons.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {input.bw}
+        """
+
+
+
+
+rule generate_coverage:
+    input:
+        chrom_info = SNAKEDIR + "/data/chrNameLength.txt"
+
+    output:
+        out = expand("Coverage_files/" + sample + "_{seqnames}_mean_cov.rda", seqnames=chr)
+
+    params:
+        bw_dir = config["bigwig_dir"],
+        resPath = "Coverage_files",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/generate_coverage.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.bw_dir} {params.resPath} {params.prefix} {input.chrom_info}
+        """
+
+
+
+rule cal_exp_feat:
+    input:
+        ers = rules.extract_known_regions.output.out,
+        coverage_files = rules.generate_coverage.output.out
+
+    output:
+        out = "F3UTER_features/" + sample + "_exp_feat.txt"
+
+    params:
+        resPath = "F3UTER_features",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/exp_features.R",
+        coverage_dir = "Coverage_files"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix} {params.coverage_dir}
+        """
+
+
+
+
+rule make_ml_table:
+    input:
+        nt = rules.cal_nt_freq.output.out,
+        pas = rules.cal_pas.output.out,
+        cons = rules.cal_phastcons.output.out,
+        repeats = rules.cal_repeats.output.out,
+        exp = rules.cal_exp_feat.output.out
+
+    output:
+        ml_table = "F3UTER_prediction/" + sample + "_ml_table.rds"
+
+    params:
+        feat_dir = "F3UTER_features",
+        resPath = "F3UTER_prediction",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/make_ML_table.R"
+
+    shell:
+        """
+        Rscript {params.script} {params.feat_dir} {params.resPath} {params.prefix}
+        """
+
+
+
+
+rule make_f3uter_predictions:
+    input:
+        ml_table = rules.make_ml_table.output.ml_table,
+        prediction_model = SNAKEDIR + "/data/rf_model_no_dsp.rda"
+
+    output:
+        preds = "F3UTER_prediction/" + sample + "_predictions.txt",
+        perf = "F3UTER_prediction/" + sample + "_performance.txt",
+        confuse = "F3UTER_prediction/" + sample + "_confusemat.txt",
+        auc = "F3UTER_prediction/" + sample + ".auc.txt",
+        roc = "F3UTER_prediction/" + sample + "_rocValues.mean.txt",
+        pr = "F3UTER_prediction/" + sample + "_prValues.mean.txt"
+
+    params:
+        resPath = "F3UTER_prediction",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/f3uter_predict.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ml_table} {params.resPath} {params.prefix} {input.prediction_model}
+        """
+
+
+
+rule plot_ml_curves:
+    input:
+        roc = rules.make_f3uter_predictions.output.roc,
+        pr = rules.make_f3uter_predictions.output.pr,
+        auc = rules.make_f3uter_predictions.output.auc
+
+
+    output:
+        roc = "F3UTER_prediction/" + sample + "_roc.png",
+        pr = "F3UTER_prediction/" + sample + "_pr.png"
+
+    params:
+        resPath = "F3UTER_prediction",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/plot_roc_pr.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.roc} {input.pr} {input.auc} {params.resPath} {params.prefix}
+        """

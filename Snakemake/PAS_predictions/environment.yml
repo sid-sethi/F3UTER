@@ -1,0 +1,13 @@
+name: pipeline_pas_predictions
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - samtools
+ - r-tidyverse
+ - snakemake==5.32.2
+ - bioconductor-BSgenome
+ - bioconductor-rtracklayer
+ - bioconductor-BSgenome.Hsapiens.UCSC.hg38.masked

@@ -1,0 +1,25 @@
+## General pipeline parameters:
+
+# working directory:
+# all results will be stored within this directory
+workdir: ""
+
+# prefix of all output files
+sample_name: "MouseLiver"
+
+# mouse gtf_file
+gtf_file: "/<>/Mus_musculus.GRCm38.102.gtf"
+
+# PhastCons Bigwig file from UCSC
+phastcons: "/<>/mm10.60way.phastCons60wayEuarchontoGlire.bw"
+
+# mm10 repeatmasker data
+repeats: "/<>/mm10.repeatMasker.mod.fa.out"
+
+# Expression data: directory containing sample bigwigs for calculating expression features
+# all files with ".bw" will be read from this directory
+bigwig_dir: ""
+
+# TPM directory: tpm abundance generated using kallisto
+# This is only to filter GTF to extract only expressed transcripts
+tpm_dir: ""

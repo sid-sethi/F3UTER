@@ -1,0 +1,21 @@
+## General pipeline parameters:
+
+# working directory:
+# Within this directory, directory called "F3UTER_predictions", "Intergenic ERs" and "TxDb" should be there
+workdir: ""
+
+# prefix of all output files
+sample_name: ""
+
+# directory containing 3'-end seq data from poly(A) atlas - ".bed" files will be read and merged
+pas_dir: ""
+
+
+
+### Files required for permutation - background overlap with PAS
+
+# gtf file
+gtf_file: "/<>/Homo_sapiens.GRCh38.94.gtf"
+
+# BEDTOOLS path
+bedtools: "/<>/bedtools"

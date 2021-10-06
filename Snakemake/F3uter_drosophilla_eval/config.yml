@@ -1,0 +1,25 @@
+## General pipeline parameters:
+
+# working directory:
+# all results will be stored within this directory
+workdir: ""
+
+# prefix of all output files
+sample_name: "DrosoData"
+
+# Drosophilla Ensembl gtf_file
+gtf_file: "/<>/Drosophila_melanogaster.BDGP6.32.104.gtf"
+
+# PhastCons Bigwig file from UCSC
+phastcons: "/<>/dm6.27way.phastCons.bw"
+
+# dm6 repeatmasker data
+repeats: "/<>/dm6.mod.fa.out"
+
+# Expression data: directory containing sample bigwigs for calculating expression features
+# all files with ".bw" will be read from this directory
+bigwig_dir: ""
+
+# TPM directory: tpm abundance generated using kallisto
+# This is only to filter GTF to extract only expressed transcripts
+tpm_dir: ""

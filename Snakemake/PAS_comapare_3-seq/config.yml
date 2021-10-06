@@ -1,0 +1,15 @@
+## General pipeline parameters:
+
+# working directory:
+# Within this directory, directory called "PAS_predictions" and "TxDb" should be there
+workdir: ""
+
+# prefix of all output files
+sample_name: ""
+
+
+# path to ER file or BED file which was used to generate predictions [input file to Generate-F3UTER-predictions]
+ers: "/<>/_3prime_intergenic_ers.txt"
+
+# directory containing PAS data from poly(A) atlas - ".bed" files will be read and merged
+pas_dir: ""

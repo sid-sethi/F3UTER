@@ -1,0 +1,222 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+# ----------------------------------------------------------------
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+sample = config["sample_name"]
+preds = WORKDIR + "/F3UTER_prediction/" + sample + "_predictions_meta.txt"
+txdb_gtf = WORKDIR + "/TxDb/gtf_TxDb.Rsqlite"
+
+files required for permutation
+three_prime = WORKDIR + "/Intergenic_ERs/" + sample + "_3prime_intergenic_ers.txt"
+five_prime = WORKDIR + "/Intergenic_ERs/" + sample + "_5prime_intergenic_ers.txt"
+bedtools = config["bedtools"]
+iter = list(range(1,10001))
+
+# ----------------------------------------------------------------
+
+rule all:
+    input:
+        "F3UTER_prediction/" + sample + "_reference_compare_pas.txt",
+        "F3UTER_prediction/" + sample + "_f3uter_compare_pas.txt",
+        "F3UTER_prediction/" + sample + "_f3uter_performance.txt",
+    	"F3UTER_prediction/" + sample + "_f3uter_confusemat.txt",
+    	"F3UTER_prediction/" + sample + "_f3uter_df.txt",
+        "F3UTER_prediction/MultiProbs/" + sample + "_f3uter_compare_pas_multiProb.txt",
+        "F3UTER_prediction/MultiProbs/" + sample + "_ppv_multiProb.png",
+        "F3UTER_prediction/MultiProbs/" + sample + "_FOR_multiProb.png"
+        "F3UTER_prediction/Permutation/" + sample + "_regions_to_exclude.txt",
+        "F3UTER_prediction/Permutation/" + sample + "_3prime_intergenic_ers.bed",
+        expand("F3UTER_prediction/Permutation/" + sample + "_ShuffledRegions/sim.{iteration}.txt", iteration = iter),
+        "F3UTER_prediction/Permutation/" + sample + "_simRes.txt",
+        "F3UTER_prediction/Permutation/" + sample + "_simRes.png"
+
+
+
+#########################################################################
+
+
+rule compare_known_utrs_with_pas_for_reference:
+    input:
+        three_prime_data = SNAKEDIR + "/data/three_prime.RData"
+    output:
+        res_txt = "F3UTER_prediction/" + sample + "_reference_compare_pas.txt"
+
+    params:
+        resPath = "F3UTER_prediction",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/reference_compare_pas.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.three_prime_data} {params.resPath} {params.prefix} {params.pas_dir}
+        """
+
+
+
+rule compare_f3uter_predictions:
+    input:
+        pred_file = preds,
+        txdb_sqlite = txdb_gtf
+    output:
+        res_txt = "F3UTER_prediction/" + sample + "_f3uter_compare_pas.txt",
+        perf = "F3UTER_prediction/" + sample + "_f3uter_performance.txt",
+    	confusemat = "F3UTER_prediction/" + sample + "_f3uter_confusemat.txt",
+    	res_df = "F3UTER_prediction/" + sample + "_f3uter_df.txt"
+
+    params:
+        resPath = "F3UTER_prediction",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/f3uter_compare_pas.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {input.pred_file} {params.resPath} {params.prefix} {params.pas_dir} {input.txdb_sqlite} {params.scriptPath}
+        """
+
+
+
+rule compare_f3uter_multiprob:
+    input:
+        pred_file = preds,
+        txdb_sqlite = txdb_gtf
+    output:
+        res_txt = "F3UTER_prediction/MultiProbs/" + sample + "_f3uter_compare_pas_multiProb.txt"
+
+    params:
+        resPath = "F3UTER_prediction/MultiProbs",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/f3uter_compare_pas_multiProb.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {input.pred_file} {params.resPath} {params.prefix} {params.pas_dir} {input.txdb_sqlite} {params.scriptPath}
+        """
+
+
+
+
+rule plot_multiprob:
+    input:
+        res = rules.compare_f3uter_multiprob.output.res_txt
+
+    output:
+        ppv = "F3UTER_prediction/MultiProbs/" + sample + "_ppv_multiProb.png",
+        FOR = "F3UTER_prediction/MultiProbs/" + sample + "_FOR_multiProb.png"
+
+    params:
+        resPath = "F3UTER_prediction/MultiProbs",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/plot_pas_multiProb.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.res} {params.resPath} {params.prefix}
+        """
+
+
+
+
+#################################################################################################
+################### permutation to calculate background overlap with PAS ########################
+################################################################################################
+
+rule generate_genomic_space_to_exclude:
+    input:
+        three_prime_file = three_prime,
+        five_prime_file = five_prime,
+        gtf_file = config["gtf_file"]
+
+    output:
+        regions = "F3UTER_prediction/Permutation/" + sample + "_regions_to_exclude.txt"
+
+    params:
+        resPath = "F3UTER_prediction/Permutation",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/regions_to_exclude.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.three_prime_file} {input.five_prime_file} {params.resPath} {params.prefix} {input.gtf_file}
+        """
+
+
+
+
+rule generate_er_bed:
+    input:
+        three_prime_file = three_prime
+
+    output:
+        bed = "F3UTER_prediction/Permutation/" + sample + "_3prime_intergenic_ers.bed"
+
+    params:
+        resPath = "F3UTER_prediction/Permutation",
+        prefix = sample
+
+    shell:
+        """
+        cut -f1-3 {input.three_prime_file} | sed 1d > {params.resPath}/{params.prefix}_3prime_intergenic_ers.bed
+        """
+
+
+
+rule shuffle_regions:
+    input:
+        three_prime_bed = rules.generate_er_bed.output.bed,
+        regions_to_exclude = rules.generate_genomic_space_to_exclude.output.regions,
+        chrom_sizes = SNAKEDIR + "/data/chromInfo_hg38_v2.txt"
+
+    output:
+        regions = "F3UTER_prediction/Permutation/" + sample + "_ShuffledRegions/sim.{iteration}.txt"
+
+    params:
+        resPath = "F3UTER_prediction/Permutation/" + sample + "_ShuffledRegions",
+        prefix = sample,
+        tool = bedtools + "/bin/bedtools",
+        seed = "{iteration}"
+
+    shell:
+        """
+        {params.tool} shuffle -i {input.three_prime_bed} -g {input.chrom_sizes} -chrom -excl {input.regions_to_exclude} -seed {params.seed} > {params.resPath}/sim.{params.seed}.txt
+        """
+
+
+
+
+rule summarise_permutation:
+    input:
+        f3uter_res = rules.compare_f3uter_predictions.output.res_txt,
+        txdb_sqlite = txdb_gtf,
+        regions = expand("F3UTER_prediction/Permutation/" + sample + "_ShuffledRegions/sim.{iteration}.txt", iteration = iter)
+
+    output:
+        simRes = "F3UTER_prediction/Permutation/" + sample + "_simRes.txt",
+        simPlot = "F3UTER_prediction/Permutation/" + sample + "_simRes.png"
+
+    params:
+        resPath = "F3UTER_prediction/Permutation",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        shuff_dir = "F3UTER_prediction/Permutation/" + sample + "_ShuffledRegions",
+        script = SNAKEDIR + "/scripts/summarise_permutation.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {params.pas_dir} {params.shuff_dir} {input.f3uter_res} {params.resPath} {params.prefix} {input.txdb_sqlite} {params.scriptPath}
+        """

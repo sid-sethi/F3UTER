@@ -1,0 +1,22 @@
+name: pipeline_mouse_eval
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - snakemake==5.32.2
+ - bioconductor-derfinder
+ - bioconductor-BSgenome
+ - bioconductor-rtracklayer
+ - bioconductor-BSgenome.Mmusculus.UCSC.mm10
+ - bioconductor-TFBSTools
+ - r-scales
+ - r-randomForest
+ - r-ROCR
+ - r-caret
+ - r-e1071
+ - r-PRROC
+ - r-rlist
+ - r-matrixStats

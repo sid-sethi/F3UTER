@@ -1,0 +1,181 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+# ----------------------------------------------------------------
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+er_file = config["ers"]
+sample = config["sample_name"]
+
+# ----------------------------------------------------------------
+
+rule all:
+    input:
+        "PAS_predictions/Aparent/" + sample + "_aparent.txt",
+        "PAS_predictions/Tapas/" + sample + "_refFlat.txt",
+        "PAS_predictions/Tapas/" + sample + "_coverage.txt",
+        "PAS_predictions/Tapas/" + sample + "_read_length.txt",
+        "PAS_predictions/Tapas/" + sample + "_tapas.txt"
+	    "PAS_predictions/Getutr/" + sample + ".PAVA.cps.2.0.0.bed"
+
+
+
+#########################################################################
+############## APARENT ##################
+
+rule get_sequence:
+    input:
+        ers = er_file
+
+    output:
+        er_seq = "PAS_predictions/Aparent/" + sample + "_seq.txt"
+
+    params:
+        resPath = "PAS_predictions/Aparent",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/er_get_sequence.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+
+rule generate_aparent_predictions:
+    input:
+        er_seq = rules.get_sequence.output.er_seq,
+        aparent_model = SNAKEDIR + "/data/aparent_large_lessdropout_all_libs_no_sampleweights.h5"
+
+    output:
+        apa_preds = "PAS_predictions/Aparent/" + sample + "_aparent.txt"
+
+    params:
+        resPath = "PAS_predictions/Aparent",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/run_aparent.py"
+
+    conda: "envs/aparent.yml"
+
+    shell:
+        """
+        python {params.script} {input.er_seq} {input.aparent_model} {params.resPath} {params.prefix}
+        """
+
+
+
+#########################################################################
+############## TAPAS ##################
+
+
+rule generate_refFlat:
+    input:
+        ers = er_file
+
+    output:
+        ref = "PAS_predictions/Tapas/" + sample + "_refFlat.txt"
+
+    params:
+        resPath = "PAS_predictions/Tapas",
+        prefix = sample,
+        script = SNAKEDIR + "/scripts/ers_to_refFlat.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ers} {params.resPath} {params.prefix}
+        """
+
+
+
+rule generate_depth:
+    input:
+        bam_file = config["bam_file"]
+
+    output:
+        depth = "PAS_predictions/Tapas/" + sample + "_coverage.txt"
+
+    shell:
+        """
+        samtools depth -o {output.depth} {input.bam_file}
+        """
+
+
+
+rule cal_read_length:
+    input:
+        bam_file = config["bam_file"]
+
+    output:
+        length = "PAS_predictions/Tapas/" + sample + "_read_length.txt"
+
+    params:
+        outfile = WORKDIR + "/PAS_predictions/Tapas/" + sample + "_read_length.txt"
+
+    run:
+        from subprocess import Popen, PIPE
+        import pandas as pd
+        samtools_command = "samtools view " + input.bam_file
+        p1 = Popen(samtools_command, shell=True, stdout=PIPE)
+        p2 = Popen("head -n 100000", shell=True, stdin=p1.stdout, stdout=PIPE)
+        p3 = Popen("awk '{print length($10)}'", shell=True, stdin=p2.stdout, stdout=PIPE)
+        p4 = Popen("awk '{ sum += $1 } END { if (NR > 0) print sum / NR }'", shell=True, stdin=p3.stdout, stdout=PIPE)
+        result = p4.communicate()[0].decode("utf-8")
+        result = result.strip()
+        data = []
+        data.append(result)
+        data_df = pd.DataFrame(data, columns = ["length"])
+        data_df.to_csv(output.length, sep="\t", index=False, header=True)
+
+
+rule run_tapas:
+    input:
+        length = rules.cal_read_length.output.length,
+        refFlat = rules.generate_refFlat.output.ref,
+        coverage = rules.generate_depth.output.depth
+
+    output:
+        res = "PAS_predictions/Tapas/" + sample + "_tapas.txt"
+
+    params:
+        tool = SNAKEDIR + "/data/Tapas_APA_sites_detection"
+
+    run:
+        import pandas as pd
+        df = pd.read_csv(input.length, delimiter = "\t")
+        x = df.iloc[0][0]
+        shell("{params.tool} -ref {input.refFlat} -cov {input.coverage} -l {x} -o {output.res}")
+
+
+
+
+#########################################################################
+############## GETUTR ##################
+## runs on the UCL/DRI server #################
+
+rule run_getutr:
+    input:
+        bam = config["bam_file"],
+        refFlat = rules.generate_refFlat.output.ref
+
+    output:
+        res1 = "PAS_predictions/Getutr/" + sample + ".PAVA.cps.2.0.0.bed",
+        res2 = "PAS_predictions/Getutr/" + sample + ".PAVA.smoothed.2.0.0.bed"
+
+    params:
+        prefix = "PAS_predictions/Getutr/" + sample,
+        getutr_path = config["getutr_path"]
+
+    conda: "envs/getutr.yml"
+
+    shell:
+        """
+        python {params.getutr_path}/getutr.py -i {input.bam} -r {input.refFlat} -o {params.prefix}
+        """

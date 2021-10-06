@@ -1,0 +1,23 @@
+## General pipeline parameters:
+
+# working directory:
+# all results will be stored within this directory
+workdir: ""
+
+# prefix of all output files
+sample_name: "ZebrafishLiver"
+
+# zebrafish gtf_file
+gtf_file: "/<>/Danio_rerio.GRCz10.91.gtf"
+
+
+# grcz10 repeatmasker data
+repeats: "/<>/danRer10.mod.fa.out"
+
+# Expression data: directory containing sample bigwigs for calculating expression features
+# all files with ".bw" will be read from this directory
+bigwig_dir: ""
+
+# TPM directory: tpm abundance generated using kallisto
+# This is only to filter GTF to extract only expressed transcripts
+tpm_dir: ""

@@ -1,0 +1,24 @@
+## General pipeline parameters:
+
+# working directory:
+workdir: ""
+
+# prefix of all output files
+sample_name: ""
+
+# path to ER file or BED file which was used to generate features [input file to "generate_features"]
+ers: "/_3prime_intergenic_ers.txt"
+
+
+############################
+##### For TAPAS ############
+############################
+
+bam_file: ""
+
+
+############################
+##### For GETUTR ############
+############################
+
+getutr_path: "/<>/GETUTR.2.0.0_for_rpy2"

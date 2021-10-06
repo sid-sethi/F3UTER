@@ -1,0 +1,16 @@
+name: pipeline_pas_compare_3-seq
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - snakemake==5.32.2
+ - bioconductor-derfinder
+ - bioconductor-rtracklayer
+ - bioconductor-AnnotationDbi
+ - r-grid
+ - r-tools
+ - r-ggpubr
+ - r-caret

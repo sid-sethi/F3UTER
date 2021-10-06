@@ -1,0 +1,113 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+# ----------------------------------------------------------------
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+sample = config["sample_name"]
+ers = config["ers"]
+txdb_gtf = WORKDIR + "/TxDb/gtf_TxDb.Rsqlite"
+
+# ----------------------------------------------------------------
+
+rule all:
+    input:
+        "PAS_predictions/Aparent/" + sample + "_aparent_compare_pas.txt",
+        "PAS_predictions/Aparent/" + sample + "_aparent_performance.txt",
+    	"PAS_predictions/Aparent/" + sample + "_aparent_confusemat.txt",
+    	"PAS_predictions/Aparent/" + sample + "_aparent_df.txt",
+        "PAS_predictions/Tapas/" + sample + "_tapas_compare_pas.txt",
+    	"PAS_predictions/Tapas/" + sample + "_tapas_performance.txt",
+    	"PAS_predictions/Tapas/" + sample + "_tapas_confusemat.txt",
+    	"PAS_predictions/Tapas/" + sample + "_tapas_df.txt",
+        "PAS_predictions/Getutr/" + sample + "_getutr_compare_pas.txt",
+    	"PAS_predictions/Getutr/" + sample + "_getutr_performance.txt",
+    	"PAS_predictions/Getutr/" + sample + "_getutr_confusemat.txt",
+    	"PAS_predictions/Getutr/" + sample + "_getutr_df.txt"
+
+
+
+#########################################################################
+
+
+rule compare_aparent_predictions:
+    input:
+        apa_pred = WORKDIR + "/PAS_predictions/Aparent/" + sample + "_aparent.txt",
+        er_file = ers,
+        txdb_sqlite = txdb_gtf
+    output:
+        res_txt = "PAS_predictions/Aparent/" + sample + "_aparent_compare_pas.txt",
+    	perf = "PAS_predictions/Aparent/" + sample + "_aparent_performance.txt",
+    	confusemat = "PAS_predictions/Aparent/" + sample + "_aparent_confusemat.txt",
+    	res_df = "PAS_predictions/Aparent/" + sample + "_aparent_df.txt"
+
+    params:
+        resPath = "PAS_predictions/Aparent",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/aparent_compare_pas.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {input.apa_pred} {input.er_file} {params.resPath} {params.prefix} {params.pas_dir} {input.txdb_sqlite} {params.scriptPath}
+        """
+
+
+
+rule compare_tapas_predictions:
+    input:
+        tapas_pred = WORKDIR + "/PAS_predictions/Tapas/" + sample + "_tapas.txt",
+        er_file = ers,
+        txdb_sqlite = txdb_gtf
+    output:
+        res_txt = "PAS_predictions/Tapas/" + sample + "_tapas_compare_pas.txt",
+    	perf = "PAS_predictions/Tapas/" + sample + "_tapas_performance.txt",
+    	confusemat = "PAS_predictions/Tapas/" + sample + "_tapas_confusemat.txt",
+    	res_df = "PAS_predictions/Tapas/" + sample + "_tapas_df.txt"
+
+    params:
+        resPath = "PAS_predictions/Tapas",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/tapas_compare_pas.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {input.tapas_pred} {input.er_file} {params.resPath} {params.prefix} {params.pas_dir} {input.txdb_sqlite} {params.scriptPath}
+        """
+
+
+
+
+rule compare_getutr_predictions:
+    input:
+        getutr_pred = WORKDIR + "/PAS_predictions/Getutr/" + sample + ".PAVA.cps.2.0.0.bed",
+        er_file = ers,
+        txdb_sqlite = txdb_gtf
+    output:
+        res_txt = "PAS_predictions/Getutr/" + sample + "_getutr_compare_pas.txt",
+    	perf = "PAS_predictions/Getutr/" + sample + "_getutr_performance.txt",
+    	confusemat = "PAS_predictions/Getutr/" + sample + "_getutr_confusemat.txt",
+    	res_df = "PAS_predictions/Getutr/" + sample + "_getutr_df.txt"
+
+    params:
+        resPath = "PAS_predictions/Getutr",
+        prefix = sample,
+        pas_dir = config["pas_dir"],
+        script = SNAKEDIR + "/scripts/getutr_compare_pas.R",
+        scriptPath = SNAKEDIR + "/scripts"
+
+    shell:
+        """
+        Rscript {params.script} {input.getutr_pred} {input.er_file} {params.resPath} {params.prefix} {params.pas_dir} {input.txdb_sqlite} {params.scriptPath}
+        """
