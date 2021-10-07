@@ -32,6 +32,7 @@ The majority of the analysis (including the plots) presented in the manuscript c
 - [PAS_predictions](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/PAS_predictions): Predicting poly(A) sites within ERs using existing poly(A) site prediction tools.
 - [PAS_comapare_3-seq](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/PAS_comapare_3-seq): Compares poly(A) site predictions with paired 3'-end sequencing data.
 - [Gtex_analysis](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/Gtex_analysis): Applies F3UTER to ERs from 39 GTEx tissues and performs all downstream analysis.
+- [RBP_analysis](https://github.com/sid-sethi/F3UTER/tree/master/Snakemake/RBP_analysis): Calculates RBP density enrichment in unannotated 3'UTR predictions.
 
 ## Analysis code associated with the F3UTER manuscript
 
