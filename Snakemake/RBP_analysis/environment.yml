@@ -1,0 +1,15 @@
+name: pipeline_rbp_analysis
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+dependencies:
+ - r-base=3.6.2
+ - r-tidyverse
+ - r-rstatix
+ - r-coin
+ - r-ggsignif
+ - r-ggridges
+ - snakemake==5.32.2
+ - r-ggpubr
+ - bioconductor-Biostrings

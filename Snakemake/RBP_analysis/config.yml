@@ -1,0 +1,7 @@
+## General pipeline parameters:
+
+# Within this directory, "Fasta" and "UTR_tissue_specificity" (results from Gtex analysis) directory should be there.
+workdir: ""
+
+# path to meme tool (meme-5.3.3)
+meme_path: "/<>/meme"

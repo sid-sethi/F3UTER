@@ -1,0 +1,220 @@
+import os
+from os import path
+
+from snakemake.utils import min_version
+min_version("5.3")
+
+
+configfile: "config.yml"
+workdir: config["workdir"]
+
+WORKDIR = config["workdir"]
+SNAKEDIR = path.dirname(workflow.snakefile)
+
+
+groups = [
+    "all.neg",
+    "all.pos",
+    "all.pos.shuf",
+    "brainSpec.neg",
+    "brainSpec.pos",
+    "brainSpec.pos.shuf",
+    "tisSpec.neg",
+    "tisSpec.pos",
+    "tisSpec.pos.shuf",
+    "shared.neg",
+    "shared.pos",
+    "shared.pos.shuf",
+    "known_utrs"
+]
+
+RBP_db = ["Attract", "CISBP-RNA"]
+
+
+#------------------------------------------------------
+
+
+rule all:
+    input:
+        expand("RBP_analysis/Summary/{group_name}_seq_sum.txt", group_name = groups),
+        expand("RBP_analysis/{db}/Summary/all.density.png", db=RBP_db),
+        "RBP_analysis/Ame_Attract/brain_spec_vs_shared/Summary/brain_spec_vs_shared_rbpNames.txt",
+        "RBP_analysis/Ame_Attract/brain_spec_vs_shared/Summary/brain_spec_vs_shared_table.txt"
+
+
+###########################################################
+########### ATTRACT curation #############################
+
+rule get_human_attract:
+    input:
+        db = SNAKEDIR + "/data/ATtRACT_db.txt"
+
+    output:
+        db = "RBP_analysis/Attract_curated/attract_db_human.txt"
+
+    params:
+        resPath = "RBP_analysis/Attract_curated",
+        script = SNAKEDIR + "/scripts/get_human_attract.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.db} {params.resPath}
+        """
+
+
+rule get_human_pwms:
+    input:
+        db = rules.get_human_attract.output.db,
+        pwm = SNAKEDIR + "/data/pwm.txt"
+
+    output:
+        pwm = "RBP_analysis/Attract_curated/pwm_human.txt"
+
+    params:
+        resPath = "RBP_analysis/Attract_curated",
+        script = SNAKEDIR + "/scripts/get_human_pwms.pl"
+
+    shell:
+        """
+        perl {params.script} -db {input.db} -pwm {input.pwm} -path {params.resPath}
+        """
+
+
+rule convert_pwm_to_meme:
+    input:
+        pwm = rules.get_human_pwms.output.pwm
+
+    output:
+        meme = "RBP_analysis/Attract_curated/pwm_human.meme"
+
+    params:
+        resPath = "RBP_analysis/Attract_curated",
+        meme = config["meme_path"]
+
+    shell:
+        """
+        {params.meme}/libexec/meme-5.3.3/chen2meme {input.pwm} > {params.resPath}/pwm_human.meme
+        """
+
+#########################################################
+
+
+#########################################################
+############ MEME analysis #############################
+
+rule run_fimo:
+    input:
+        pwm = rules.convert_pwm_to_meme.output.meme,
+        fasta = "Fasta/{group_name}.fasta"
+
+    output:
+        meme = "RBP_analysis/Attract/{group_name}/fimo.tsv"
+
+    params:
+        resPath = "RBP_analysis/Attract/{group_name}",
+        meme = config["meme_path"]
+
+    shell:
+        """
+        {params.meme}/bin/fimo --bfile --uniform-- -oc {params.resPath} {input.pwm} {input.fasta}
+        """
+
+
+rule run_fimo_cisbp:
+    input:
+        pwm = SNAKEDIR + "/data/Homo_sapiens.dna_encoded_cisbp_rna.meme",
+        fasta = "Fasta/{group_name}.fasta"
+
+    output:
+        meme = "RBP_analysis/CISBP-RNA/{group_name}/fimo.tsv"
+
+    params:
+        resPath = "RBP_analysis/CISBP-RNA/{group_name}",
+        meme = config["meme_path"]
+
+    shell:
+        """
+        {params.meme}/bin/fimo --bfile --uniform-- -oc {params.resPath} {input.pwm} {input.fasta}
+        """
+
+
+rule summarise_fimo:
+    input:
+        fimo_file = "RBP_analysis/{db}/{group_name}/fimo.tsv",
+        fasta = "Fasta/{group_name}.fasta"
+
+    output:
+        res = "RBP_analysis/{db}/Summary/{group_name}_seq_sum.txt"
+
+    params:
+        resPath = "RBP_analysis/{db}/Summary",
+        pval = "10e-5",
+        prefix = "{group_name}",
+        script = SNAKEDIR + "/scripts/summarise_fimo.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.fimo_file} {params.pval} {params.resPath} {params.prefix} {input.fasta}
+        """
+
+
+rule summarise_fimo_plot:
+    input:
+        summary_files = expand("RBP_analysis/{db}/Summary/{group_name}_seq_sum.txt", db=RBP_db, group_name=groups),
+        utr_tissue_specificity = "UTR_tissue_specificity/utr_tissue_specificity_results.txt"
+
+    output:
+        res = "RBP_analysis/{db}/Summary/all.density.png"
+
+    params:
+        resPath = "RBP_analysis/{db}/Summary",
+        script = SNAKEDIR + "/scripts/summarise_fimo_plot.R"
+
+    conda: "envs/R_env.yml"
+
+    shell:
+        """
+        Rscript {params.script} {params.resPath} {params.resPath} {input.utr_tissue_specificity}
+        """
+
+
+
+rule run_ame:
+    input:
+        pwm = rules.convert_pwm_to_meme.output.meme,
+        fasta = "Fasta/brainSpec.pos.fasta",
+        control = "Fasta/shared.pos.fasta"
+
+    output:
+        meme = "RBP_analysis/Ame_Attract/brain_spec_vs_shared/fimo.tsv"
+
+    params:
+        resPath = "RBP_analysis/Ame_Attract/brain_spec_vs_shared",
+        meme = config["meme_path"]
+
+    shell:
+        """
+        {params.meme}/bin/ame --scoring avg --oc {params.resPath} --control {input.control} {input.fasta} {input.pwm}
+        """
+
+
+
+
+rule summarise_ame:
+    input:
+        ame_file = "RBP_analysis/Ame_Attract/brain_spec_vs_shared/ame.tsv"
+
+    output:
+        f1 = "RBP_analysis/Ame_Attract/brain_spec_vs_shared/Summary/brain_spec_vs_shared_rbpNames.txt",
+        f2 = "RBP_analysis/Ame_Attract/brain_spec_vs_shared/Summary/brain_spec_vs_shared_table.txt"
+
+    params:
+        resPath = "RBP_analysis/Ame_Attract/brain_spec_vs_shared/Summary",
+        pval = "10e-5",
+        prefix = "brain_spec_vs_shared",
+        script = SNAKEDIR + "/scripts/summarise_ame.R"
+
+    shell:
+        """
+        Rscript {params.script} {input.ame_file} {params.pval} {params.resPath} {params.prefix}
+        """
