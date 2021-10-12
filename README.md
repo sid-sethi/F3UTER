@@ -14,7 +14,7 @@ This repository is distributed in the hope that it will be useful, but WITHOUT A
 
 Use the F3UTER app to query predictions associated with the genes of your interest: https://astx.shinyapps.io/F3UTER/
 
-The following snakemake pipelines can be used to Generate ERs, calculate omic features and produce 3'UTR predictions using F3UTER.
+The following `snakemake` pipelines can be used to Generate ERs, calculate omic features and produce 3'UTR predictions using F3UTER.
 
 - [Generate ERs](https://github.com/sid-sethi/Generate-ERs): Identify unannotated intergenic expressed regions (ERs) from RNA-seq data.
 - [Generate F3UTER features](https://github.com/sid-sethi/Generate-F3UTER-features): Calculate omic features required for F3UTER.
