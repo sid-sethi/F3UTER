@@ -147,4 +147,4 @@ All the data analysis was performed in R version 3.6.2. For analysis or plotting
 
 Please cite our preprint when using F3UTER:
 
-Leveraging omic features with F3UTER enables identification of unannotated 3’UTRs for synaptic genes. Siddharth Sethi, David Zhang, Sebastian Guelfi, Zhongbo Chen, Sonia Garcia-Ruiz, Mina Ryten, Harpreet Saini, Juan A. Botia. bioRxiv 2021.03.08.434412; doi: https://doi.org/10.1101/2021.03.08.434412
+**Leveraging omic features with F3UTER enables identification of unannotated 3’UTRs for synaptic genes.** Siddharth Sethi, David Zhang, Sebastian Guelfi, Zhongbo Chen, Sonia Garcia-Ruiz, Mina Ryten, Harpreet Saini, Juan A. Botia. bioRxiv 2021.03.08.434412; doi: https://doi.org/10.1101/2021.03.08.434412
