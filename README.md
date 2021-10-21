@@ -7,6 +7,7 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 <!-- badges: end -->
 
 This repository contains the analysis code for F3UTER.
+Preprint: https://doi.org/10.1101/2021.03.08.434412
 
 ## Licence
 
@@ -141,3 +142,9 @@ App URL: https://astx.shinyapps.io/F3UTER/
 ## System requirements for data analysis
 
 All the data analysis was performed in R version 3.6.2. For analysis or plotting, the following packages were used: ggplot2_2_3.3.2, ggridges_0.5.2, ggridges_0.5.2, ggsignif_0.6.0, rstatix_0.6.0, derfinder_1.20.0, rtracklayer_1.46.0, GenomicFeatures_1.38.2, GenomicRanges_1.38.0, ggpubr_0.4.0, stringr_1.4.0, dplyr_1.0.2, tidyverse_1.3.0
+
+# Citing F3UTER
+
+Please cite our preprint when using F3UTER:
+
+Leveraging omic features with F3UTER enables identification of unannotated 3’UTRs for synaptic genes. Siddharth Sethi, David Zhang, Sebastian Guelfi, Zhongbo Chen, Sonia Garcia-Ruiz, Mina Ryten, Harpreet Saini, Juan A. Botia. bioRxiv 2021.03.08.434412; doi: https://doi.org/10.1101/2021.03.08.434412
