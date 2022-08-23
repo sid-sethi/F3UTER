@@ -6,7 +6,7 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5569094.svg)](https://doi.org/10.5281/zenodo.5569094)
 <!-- badges: end -->
 
-This repository contains the analysis code for F3UTER. Nat Commun(2022) - https://doi.org/10.1038/s41467-022-30017-z
+This repository contains the analysis code for F3UTER. **Nat Commun (2022)** - https://doi.org/10.1038/s41467-022-30017-z
 
 
 ## Licence
