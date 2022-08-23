@@ -6,8 +6,7 @@ maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5569094.svg)](https://doi.org/10.5281/zenodo.5569094)
 <!-- badges: end -->
 
-This repository contains the analysis code for F3UTER.
-Preprint: https://doi.org/10.1101/2021.03.08.434412
+This repository contains the analysis code for F3UTER. Nat Commun(2022) - https://doi.org/10.1038/s41467-022-30017-z
 
 
 ## Licence
@@ -146,6 +145,6 @@ All the data analysis was performed in R version 3.6.2. For analysis or plotting
 
 # Citing F3UTER
 
-Please cite our preprint when using F3UTER:
+Please cite this article when using F3UTER: https://www.nature.com/articles/s41467-022-30017-z
 
-**Leveraging omic features with F3UTER enables identification of unannotated 3’UTRs for synaptic genes.** Siddharth Sethi, David Zhang, Sebastian Guelfi, Zhongbo Chen, Sonia Garcia-Ruiz, Mina Ryten, Harpreet Saini, Juan A. Botia. bioRxiv 2021.03.08.434412; doi: https://doi.org/10.1101/2021.03.08.434412
+Sethi, S., Zhang, D., Guelfi, S. et al. Leveraging omic features with F3UTER enables identification of unannotated 3’UTRs for synaptic genes. Nat Commun 13, 2270 (2022). https://doi.org/10.1038/s41467-022-30017-z
